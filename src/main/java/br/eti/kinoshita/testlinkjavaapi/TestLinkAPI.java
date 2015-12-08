@@ -452,9 +452,9 @@ public class TestLinkAPI {
      * @throws TestLinkAPIException
      * @since 1.0
      */
-    public User createUser(String username, String firstName, String lastName, String email)
+    public User createUser(String username, String firstName, String lastName, String email, Boolean isAdmin)
 			throws TestLinkAPIException {
-    	return this.userService.createUser(username, firstName, lastName, email);
+    	return this.userService.createUser(username, firstName, lastName, email, isAdmin);
     }
     
     

@@ -44,6 +44,7 @@ public enum TestLinkParams {
     ACTIONS("actions"), 
     ACTION("action"), 
     ACTIVE("active"), 
+    ADMIN("admin"),
     ASSIGNED_TO("assignedto"), 
     AUTHOR_LOGIN("authorlogin"), 
     BUG_ID("bugid"), 

@@ -6,6 +6,7 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkMethods;
+import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkParams;
 import br.eti.kinoshita.testlinkjavaapi.model.User;
 import br.eti.kinoshita.testlinkjavaapi.util.TestLinkAPIException;
 import br.eti.kinoshita.testlinkjavaapi.util.Util;
@@ -33,13 +34,14 @@ class UserService extends BaseService {
 	 * 
 	 * @return Created User object.
 	 */
-	public User createUser(String username, String firstName, String lastName, String email)
+	public User createUser(String username, String firstName, String lastName, String email, Boolean isAdmin)
 			throws TestLinkAPIException {
 
 		try {
 			User user = new User(username, firstName, lastName, email);
 
 			Map<String, Object> executionData = Util.getUserMap(user);
+			executionData.put(TestLinkParams.ADMIN.toString(), isAdmin);
 
 			Object response = this.executeXmlRpcCall(TestLinkMethods.CREATE_USER.toString(), executionData);
 
