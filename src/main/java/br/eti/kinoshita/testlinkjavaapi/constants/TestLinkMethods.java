@@ -28,8 +28,8 @@ package br.eti.kinoshita.testlinkjavaapi.constants;
  * @since 1.9.0-1
  */
 public enum TestLinkMethods {
-
-    ASSIGN_TEST_CASE_EXECUTION_TASK("tl.assignTestCaseExecutionTask"),
+	
+	ASSIGN_TEST_CASE_EXECUTION_TASK("tl.assignTestCaseExecutionTask"),
     CREATE_TEST_PROJECT("tl.createTestProject"), 
     GET_TEST_PROJECT_BY_NAME("tl.getTestProjectByName"), 
     CHECK_DEV_KEY("tl.checkDevKey"), 
@@ -42,6 +42,7 @@ public enum TestLinkMethods {
     CREATE_TEST_CASE_STEPS("tl.createTestCaseSteps"), 
     DELETE_TEST_CASE_STEPS("tl.deleteTestCaseSteps"), 
     CREATE_TEST_SUITE("tl.createTestSuite"), 
+    CREATE_USER("tl.createUser"),
     ADD_TEST_CASE_TO_TEST_PLAN("tl.addTestCaseToTestPlan"), 
     DOES_USER_EXIST("tl.doesUserExist"),
     GET_USER_BY_LOGIN("tl.getUserByLogin"),
@@ -75,15 +76,16 @@ public enum TestLinkMethods {
     GET_LATEST_BUILD_FOR_TEST_PLAN("tl.getLatestBuildForTestPlan"), 
     GET_TEST_CASE_CUSTOM_FIELD_DESIGN_VALUE("tl.getTestCaseCustomFieldDesignValue"), 
     GET_TEST_CASE_CUSTOM_FIELD_TEST_PLAN_DESIGN_VALUE("tl.getTestCaseCustomFieldTestPlanDesignValue"), 
-    GET_TEST_CASE_CUSTOM_FIELD_EXECUTION_VALUE("tl.getTestCaseCustomFieldExecutionValue"), 
+    GET_TEST_CASE_CUSTOM_FIELD_EXECUTION_VALUE("tl.getTestCaseCustomFieldExecutionValue"),
+    GET_TEST_PLAN_CUSTOM_FIELD_DESING_VALUE("tl.getTestPlanCustomFieldDesignValue"),
     GET_TOTALS_FOR_TEST_PLAN("tl.getTotalsForTestPlan"), 
     GET_EXEC_COUNTERS_BY_BUILD("tl.getExecCountersByBuild"),
     UPDATE_TEST_CASE_CUSTOM_FIELD_VALUE("tl.updateTestCaseCustomFieldDesignValue"),
     SET_TEST_CASE_EXECUTION_TYPE("tl.setTestCaseExecutionType"),
     GET_PROJECT_PLATFORMS("tl.getProjectPlatforms"),
     REMOVE_PLATFORM_FROM_TEST_PLAN("tl.removePlatformFromTestPlan"),
-    ADD_PLATFORM_TO_TEST_PLAN("tl.addPlatformToTestPlan")
-    ;
+    ADD_PLATFORM_TO_TEST_PLAN("tl.addPlatformToTestPlan"),
+    GENERATOR_DEV_KEY("tl.generateAPIKey");
 
     private String value;
 

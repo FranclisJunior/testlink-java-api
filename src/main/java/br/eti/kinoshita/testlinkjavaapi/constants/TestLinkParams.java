@@ -58,6 +58,7 @@ public enum TestLinkParams {
     DESCRIPTION("description"), 
     DETAILS("details"), 
     DEV_KEY("devKey"), 
+    EMAIL("email"),
     ENABLE_AUTOMATION("automationEnabled"), 
     ENABLE_INVENTORY("inventoryEnabled "), 
     ENABLE_REQUIREMENTS("requirementsEnabled"), 
@@ -71,6 +72,7 @@ public enum TestLinkParams {
     STEP_EXECUTION_TYPE("execution_type"), 
     EXPECTED_RESULTS("expected_results"), 
     FILE_NAME("filename"), 
+    FIRST_NAME("firstName"),
     FILE_TYPE("filetype"), 
     FK_ID("fkid"), 
     FK_TABLE("fktable"), 
@@ -80,6 +82,7 @@ public enum TestLinkParams {
     INTERNAL_ID("internalId"), 
     KEYWORD_ID("keywordid"), 
     KEYWORDS("keywords"), 
+    LAST_NAME("lastName"),
     NAME("name"), 
     NODE_ID("nodeid"), 
     NOTES("notes"), 
@@ -87,6 +90,7 @@ public enum TestLinkParams {
     ORDER("order"), 
     OVERWRITE("overwrite"), 
     PARENT_ID("parentid"), 
+    PASSWORD("pass"),
     PLATFORM_ID("platformid"), 
     PLATFORM_NAME("platformname"), 
     PRECONDITIONS("preconditions"), 
@@ -115,8 +119,7 @@ public enum TestLinkParams {
     TITLE("title"), 
     URGENCY("urgency"), 
     USER("user"), 
-    VERSION("version")
-    ;
+    VERSION("version");
     
     private String value;
 

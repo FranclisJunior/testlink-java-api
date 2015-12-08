@@ -942,7 +942,18 @@ public final class Util {
         }
         return value;
     }
-
+    
+    
+    public static final Map<String, Object> getUserMap(User user) {
+		Map<String, Object> mapData = new HashMap<String, Object>();
+		mapData.put(TestLinkParams.USER.toString(), user.getLogin());
+		mapData.put(TestLinkParams.FIRST_NAME.toString(), user.getFirstName());
+		mapData.put(TestLinkParams.LAST_NAME.toString(), user.getLastName());
+		mapData.put(TestLinkParams.EMAIL.toString(), user.getEmailAddress());
+		
+		return mapData;
+    }
+    
     @SuppressWarnings("unchecked")
 	public static final User getUser(Map<String, Object> map) {
     	User user = null;

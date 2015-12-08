@@ -51,6 +51,13 @@ public class User implements Serializable {
 		super();
 		this.dbID = dbID;
 	}
+	
+	public User(String username, String firstName, String lastName, String email) {
+		this.login = username;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.emailAddress = email;
+	}
 
 	/**
 	 * Constructor with args.
