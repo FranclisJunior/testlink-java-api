@@ -87,6 +87,7 @@ public class TestLinkAPI {
     private final BuildService buildService;
     private final RequirementService requirementService;
     private final ReqSpecService reqSpecService;
+    private final UserService userService;
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLinkAPI.class);
 
@@ -141,7 +142,8 @@ public class TestLinkAPI {
         this.buildService = new BuildService(xmlRpcClient, devKey);
         this.requirementService = new RequirementService(xmlRpcClient, devKey);
         this.reqSpecService = new ReqSpecService(xmlRpcClient, devKey);
-
+        this.userService = new UserService(xmlRpcClient, devKey);
+        
         this.miscService.checkDevKey(devKey);
     }
 
@@ -438,6 +440,24 @@ public class TestLinkAPI {
                 enableTestPriority, enableAutomation, enableInventory, isActive, isPublic);
     }
 
+    
+    /**
+     * Creates a User.
+     * 
+     * @param username
+     * @param firstName
+     * @param lastName
+     * @param email
+     * @return User object.
+     * @throws TestLinkAPIException
+     * @since 1.0
+     */
+    public User createUser(String username, String firstName, String lastName, String email)
+			throws TestLinkAPIException {
+    	return this.userService.createUser(username, firstName, lastName, email);
+    }
+    
+    
     /**
      * Retrieves a Test Project by its name.
      * 

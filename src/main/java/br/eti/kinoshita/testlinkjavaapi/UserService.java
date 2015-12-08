@@ -1,14 +1,11 @@
 package br.eti.kinoshita.testlinkjavaapi;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkMethods;
-import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkParams;
-import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkResponseParams;
 import br.eti.kinoshita.testlinkjavaapi.model.User;
 import br.eti.kinoshita.testlinkjavaapi.util.TestLinkAPIException;
 import br.eti.kinoshita.testlinkjavaapi.util.Util;
@@ -36,7 +33,6 @@ class UserService extends BaseService {
 	 * 
 	 * @return Created User object.
 	 */
-	@SuppressWarnings("unchecked")
 	public User createUser(String username, String firstName, String lastName, String email)
 			throws TestLinkAPIException {
 
@@ -47,16 +43,15 @@ class UserService extends BaseService {
 
 			Object response = this.executeXmlRpcCall(TestLinkMethods.CREATE_USER.toString(), executionData);
 
-			Object[] responseArray = (Object[]) response;
-			Map<String, Object> responseMap = (Map<String, Object>) responseArray[0];
-
-			Integer id = Util.getInteger(responseMap, TestLinkResponseParams.ID.toString());
+			Integer id = Integer.parseInt(response.toString());
 			
 			user.setDbID(id);
 			
 			return user;
 		} catch (XmlRpcException xmlrpcex) {
-			throw new TestLinkAPIException("Error create user: " + xmlrpcex.getMessage(), xmlrpcex);
+			throw new TestLinkAPIException("Error on connection with api" + xmlrpcex.getMessage(), xmlrpcex);
+		} catch (TestLinkAPIException tlEx) {
+			throw new TestLinkAPIException("Error create user: " + tlEx.getMessage(), tlEx);
 		}
 	}
 
