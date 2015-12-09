@@ -46,6 +46,7 @@ import br.eti.kinoshita.testlinkjavaapi.constants.ResponseDetails;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestCaseDetails;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestCaseStepAction;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestImportance;
+import br.eti.kinoshita.testlinkjavaapi.constants.TestProjectRole;
 import br.eti.kinoshita.testlinkjavaapi.model.Attachment;
 import br.eti.kinoshita.testlinkjavaapi.model.Build;
 import br.eti.kinoshita.testlinkjavaapi.model.CustomField;
@@ -457,6 +458,19 @@ public class TestLinkAPI {
     	return this.userService.createUser(username, firstName, lastName, email, isAdmin);
     }
     
+    /**
+     * Assing user to project
+     * 
+	 * @param projectBDId
+	 * @param username [login of user]
+	 * @param role
+	 * @return
+	 * @throws TestLinkAPIException
+	 */
+    public void assignUserToProject(Integer projectBDId, String username, TestProjectRole role) 
+    		throws TestLinkAPIException {
+    	this.testProjectService.assignUserToProject(projectBDId, username, role);
+    }
     
     /**
      * Retrieves a Test Project by its name.

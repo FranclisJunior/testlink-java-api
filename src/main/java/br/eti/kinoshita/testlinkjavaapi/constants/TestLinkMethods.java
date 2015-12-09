@@ -68,6 +68,7 @@ public enum TestLinkMethods {
     DELETE_EXECUTION("tl.deleteExecution"), 
     GET_FULL_PATH("tl.getFullPath"), 
     ASSIGN_REQUIREMENTS("tl.assignRequirements"),
+    ASSING_USER_TO_PROJECT("tl.assignUserToProject"),
     GET_TEST_SUITES_FOR_TEST_SUITE("tl.getTestSuitesForTestSuite"),
     GET_FIRST_LEVEL_TEST_SUITES_FOR_TEST_PROJECT("tl.getFirstLevelTestSuitesForTestProject"), 
     REPORT_TC_RESULT("tl.reportTCResult"), 

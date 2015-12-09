@@ -23,20 +23,18 @@
  */
 package br.eti.kinoshita.testlinkjavaapi;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
-import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkMethods;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkParams;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkResponseParams;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkTables;
+import br.eti.kinoshita.testlinkjavaapi.constants.TestProjectRole;
 import br.eti.kinoshita.testlinkjavaapi.model.Attachment;
 import br.eti.kinoshita.testlinkjavaapi.model.Platform;
 import br.eti.kinoshita.testlinkjavaapi.model.TestPlan;
@@ -252,16 +250,27 @@ class TestProjectService extends BaseService {
 		}
 	}
 	
-	public static void main(String[] args) throws MalformedURLException {
-		XmlRpcClient xmlRpcClient = new XmlRpcClient();
-		XmlRpcClientConfigImpl pConfig = new XmlRpcClientConfigImpl();
-		pConfig.setServerURL(new URL("http://localhost:3300/testlink-1.9.6/lib/api/xmlrpc.php"));
-		xmlRpcClient.setConfig(pConfig);
-		TestProjectService service = new TestProjectService(xmlRpcClient, "09b83b6813a55ef6f7e2d7d63cb6f65c");
-		Platform[] platforms = service.getProjectPlatforms(2);
-		for (Platform platform : platforms) {
-			System.out.println(platform);
+	/**
+	 * @param projectBDId
+	 * @param username [login of user]
+	 * @param role
+	 * @return
+	 * @throws TestLinkAPIException
+	 */
+	public void assignUserToProject(Integer projectBDId, String username, TestProjectRole role) throws TestLinkAPIException {
+		
+		Map<String, Object> executionData = new HashMap<String, Object>();
+		executionData.put(TestLinkParams.PROJECT_ID.toString(), projectBDId);
+		executionData.put(TestLinkParams.USER.toString(), username);
+		executionData.put(TestLinkParams.ROLE.toString(), role.toString());
+		
+		try {
+			this.executeXmlRpcCall(TestLinkMethods.ASSING_USER_TO_PROJECT.toString(), executionData);
+		} catch (XmlRpcException xmlrpcex) {
+			throw new TestLinkAPIException("Error assing user to project: " + xmlrpcex.getMessage(), xmlrpcex);
+		} catch (TestLinkAPIException tlEx) {
+			throw new TestLinkAPIException("Error assing user to project: " + tlEx.getMessage(), tlEx);
 		}
 	}
-
+	
 }
