@@ -31,85 +31,111 @@ import java.io.Serializable;
  */
 public class Requirement implements Serializable {
 
-    private static final long serialVersionUID = -972032974806459521L;
-    
-    private Integer id;
-    private Integer reqSpecId;
-    private String reqDocId;
+	private static final long serialVersionUID = -972032974806459521L;
 
-    /**
+	private Integer id;
+	private Integer reqSpecId;
+	private String reqDocId;
+	private Integer projectId;
+	private Integer externalId;
+	private String name;
+
+	/**
 	 * 
 	 */
-    public Requirement() {
-	super();
-    }
+	public Requirement() {
+		super();
+	}
 
-    /**
-     * @param id
-     * @param reqSpecId
-     * @param reqDocId
-     */
-    public Requirement(Integer id, Integer reqSpecId, String reqDocId) {
-	super();
-	this.id = id;
-	this.reqSpecId = reqSpecId;
-	this.reqDocId = reqDocId;
-    }
+	/**
+	 * @param id
+	 * @param reqSpecId
+	 * @param reqDocId
+	 */
+	public Requirement(Integer id, Integer reqSpecId, String reqDocId) {
+		super();
+		this.id = id;
+		this.reqSpecId = reqSpecId;
+		this.reqDocId = reqDocId;
+	}
 
-    /**
-     * @return the id
-     */
-    public Integer getId() {
-	return id;
-    }
+	/**
+	 * @return the id
+	 */
+	public Integer getId() {
+		return id;
+	}
 
-    /**
-     * @param id
-     *            the id to set
-     */
-    public void setId(Integer id) {
-	this.id = id;
-    }
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    /**
-     * @return the reqSpecId
-     */
-    public Integer getReqSpecId() {
-	return reqSpecId;
-    }
+	/**
+	 * @return the reqSpecId
+	 */
+	public Integer getReqSpecId() {
+		return reqSpecId;
+	}
 
-    /**
-     * @param reqSpecId
-     *            the reqSpecId to set
-     */
-    public void setReqSpecId(Integer reqSpecId) {
-	this.reqSpecId = reqSpecId;
-    }
+	/**
+	 * @param reqSpecId
+	 *            the reqSpecId to set
+	 */
+	public void setReqSpecId(Integer reqSpecId) {
+		this.reqSpecId = reqSpecId;
+	}
 
-    /**
-     * @return the reqDocId
-     */
-    public String getReqDocId() {
-	return reqDocId;
-    }
+	/**
+	 * @return the reqDocId
+	 */
+	public String getReqDocId() {
+		return reqDocId;
+	}
 
-    /**
-     * @param reqDocId
-     *            the reqDocId to set
-     */
-    public void setReqDocId(String reqDocId) {
-	this.reqDocId = reqDocId;
-    }
+	/**
+	 * @param reqDocId
+	 *            the reqDocId to set
+	 */
+	public void setReqDocId(String reqDocId) {
+		this.reqDocId = reqDocId;
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-	return "Requirement [id=" + id + ", reqSpecId=" + reqSpecId
-		+ ", reqDocId=" + reqDocId + "]";
-    }
+	public Integer getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(Integer projectId) {
+		this.projectId = projectId;
+	}
+
+	public Integer getExternalId() {
+		return externalId;
+	}
+
+	public void setExternalId(Integer externalId) {
+		this.externalId = externalId;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Requirement [id=" + id + ", reqSpecId=" + reqSpecId + ", reqDocId=" + reqDocId + "]";
+	}
 
 }

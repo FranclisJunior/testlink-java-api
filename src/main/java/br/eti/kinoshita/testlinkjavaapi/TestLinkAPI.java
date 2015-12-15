@@ -1105,7 +1105,21 @@ public class TestLinkAPI {
     }
 
     /* XX Requirements operations XX */
-
+    
+    /**
+     * Uploads an attachment to a Requirement.
+     * 
+     * @param projectId
+     * @param externalId
+     * @param name
+     * @return requirementId.
+     * @throws TestLinkAPIException
+     */
+    public Integer createRequirement(Integer projectId, Integer externalId, String name) 
+    		throws TestLinkAPIException {
+    	return requirementService.createRequirement(projectId, externalId, name);
+    }
+    
     /**
      * Uploads an attachment to a Requirement.
      * 

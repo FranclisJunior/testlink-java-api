@@ -70,8 +70,8 @@ public enum TestLinkParams {
     EXECUTION("execution"), 
     EXECUTION_ID("executionid"), 
     EXECUTION_TYPE("executiontype"),
-    STEP_EXECUTION_TYPE("execution_type"), 
     EXPECTED_RESULTS("expected_results"), 
+    EXTERNAL_ID("externalId"),
     FILE_NAME("filename"), 
     FIRST_NAME("firstName"),
     FILE_TYPE("filetype"), 
@@ -103,6 +103,7 @@ public enum TestLinkParams {
     ROLE("role"),
     SUMMARY("summary"), 
     STATUS("status"), // TBD: what is the difference between status and executestatus?
+    STEP_EXECUTION_TYPE("execution_type"), 
     STEP_NUMBER("step_number"), 
     STEPS("steps"), 
     STR("str"), 

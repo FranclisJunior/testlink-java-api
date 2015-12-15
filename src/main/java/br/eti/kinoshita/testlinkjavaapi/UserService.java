@@ -34,7 +34,7 @@ class UserService extends BaseService {
 	 * 
 	 * @return Created User object.
 	 */
-	public User createUser(String username, String firstName, String lastName, String email, Boolean isAdmin)
+	protected User createUser(String username, String firstName, String lastName, String email, Boolean isAdmin)
 			throws TestLinkAPIException {
 
 		try {
@@ -45,9 +45,9 @@ class UserService extends BaseService {
 
 			Object response = this.executeXmlRpcCall(TestLinkMethods.CREATE_USER.toString(), executionData);
 
-			Integer id = Integer.parseInt(response.toString());
+			Integer userId = Integer.parseInt(response.toString());
 			
-			user.setDbID(id);
+			user.setDbID(userId);
 			
 			return user;
 		} catch (XmlRpcException xmlrpcex) {
