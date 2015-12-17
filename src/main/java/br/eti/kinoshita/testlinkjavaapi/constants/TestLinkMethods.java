@@ -50,6 +50,7 @@ public enum TestLinkMethods {
     GENERATOR_DEV_KEY("tl.generateAPIKey"),
     GET_BUILDS_FOR_TEST_PLAN("tl.getBuildsForTestPlan"), 
     GET_EXEC_COUNTERS_BY_BUILD("tl.getExecCountersByBuild"),
+    GET_FAILED_TEST_CASES_BY_BUILD("tl.getFailedTestCasesByBuildId"),
     GET_FIRST_LEVEL_TEST_SUITES_FOR_TEST_PROJECT("tl.getFirstLevelTestSuitesForTestProject"), 
     GET_FULL_PATH("tl.getFullPath"), 
     GET_LAST_EXECUTION_RESULT("tl.getLastExecutionResult"), 

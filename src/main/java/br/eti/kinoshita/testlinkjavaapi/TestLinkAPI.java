@@ -870,6 +870,20 @@ public class TestLinkAPI {
         return this.testCaseService.getTestCasesForTestPlan(testPlanId, testCasesIds, buildId, keywordsIds, keywords,
                 executed, assignedTo, executeStatus, executionType, getStepInfo, detail);
     }
+    
+    
+    /**
+     * Retrieves Test Cases by build
+     * 
+     * @param projectId
+     * @param buildId 
+     * @return TestCase[]
+     * @throws TestLinkAPIException
+     */
+    public TestCase[] getFailedTestCasesByBuild(Integer projectId, Integer buildId)
+            throws TestLinkAPIException {
+    	return this.testCaseService.getFailedTestCasesByBuild(projectId, buildId);
+    }
 
     /**
      * Get a test case ID by a test case Name

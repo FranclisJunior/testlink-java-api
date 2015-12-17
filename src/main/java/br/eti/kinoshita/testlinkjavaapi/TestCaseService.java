@@ -31,6 +31,10 @@ import java.util.Set;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import com.google.gson.Gson;
 
 import br.eti.kinoshita.testlinkjavaapi.constants.ActionOnDuplicate;
 import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionStatus;
@@ -108,7 +112,7 @@ class TestCaseService extends BaseService {
             id = Util.getInteger(responseMap, TestLinkResponseParams.ID.toString());
             testCase.setId(id);
         } catch (XmlRpcException xmlrpcex) {
-            throw new TestLinkAPIException("Error creating test plan: " + xmlrpcex.getMessage(), xmlrpcex);
+            throw new TestLinkAPIException("Error creating test case : " + xmlrpcex.getMessage(), xmlrpcex);
         }
 
         return testCase;
@@ -226,6 +230,32 @@ class TestCaseService extends BaseService {
         }
 
         return testCases;
+    }
+    
+    /**
+     * @param projectId
+     * @param buildId 
+     * @return TestCase[]
+     * @throws TestLinkAPIException
+     */
+    protected TestCase[] getFailedTestCasesByBuild(Integer projectId, Integer buildId)
+            throws TestLinkAPIException {
+        try {
+            Map<String, Object> executionData = new HashMap<String, Object>();
+            executionData.put(TestLinkParams.PROJECT_ID.toString(), projectId);
+            executionData.put(TestLinkParams.BUILD_ID.toString(), buildId);
+
+            Object response = this.executeXmlRpcCall(TestLinkMethods.GET_FAILED_TEST_CASES_BY_BUILD.toString(), executionData);
+            Gson gson = new Gson();
+            JSONArray jsonArray = new JSONArray(response.toString());
+            TestCase[] testCases = gson.fromJson(jsonArray.get(0).toString(), TestCase[].class);
+            
+            return testCases;
+        } catch (XmlRpcException xmlrpcex) {
+            throw new TestLinkAPIException("Error retrieving test cases for build: " + xmlrpcex.getMessage(), xmlrpcex);
+        } catch (JSONException jsonex) {
+        	return new TestCase []{};
+		}
     }
 
     /**
@@ -704,7 +734,7 @@ class TestCaseService extends BaseService {
 
         return customField;
     }
-
+    
     /**
      * @param testProjectId
      * @param testCaseExternalId
