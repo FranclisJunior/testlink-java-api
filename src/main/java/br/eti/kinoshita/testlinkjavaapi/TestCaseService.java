@@ -31,10 +31,6 @@ import java.util.Set;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import com.google.gson.Gson;
 
 import br.eti.kinoshita.testlinkjavaapi.constants.ActionOnDuplicate;
 import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionStatus;
@@ -232,31 +228,37 @@ class TestCaseService extends BaseService {
         return testCases;
     }
     
-    /**
-     * @param projectId
-     * @param buildId 
-     * @return TestCase[]
-     * @throws TestLinkAPIException
-     */
-    protected TestCase[] getFailedTestCasesByBuild(Integer projectId, Integer buildId)
-            throws TestLinkAPIException {
-        try {
-            Map<String, Object> executionData = new HashMap<String, Object>();
-            executionData.put(TestLinkParams.PROJECT_ID.toString(), projectId);
-            executionData.put(TestLinkParams.BUILD_ID.toString(), buildId);
+	/**
+	 * @param projectId
+	 * @param buildId
+	 * @return TestCase[]
+	 * @throws TestLinkAPIException
+	 */
+	protected TestCase[] getFailedTestCasesByBuild(Integer projectId, Integer buildId) throws TestLinkAPIException {
 
-            Object response = this.executeXmlRpcCall(TestLinkMethods.GET_FAILED_TEST_CASES_BY_BUILD.toString(), executionData);
-            Gson gson = new Gson();
-            JSONArray jsonArray = new JSONArray(response.toString());
-            TestCase[] testCases = gson.fromJson(jsonArray.get(0).toString(), TestCase[].class);
-            
-            return testCases;
-        } catch (XmlRpcException xmlrpcex) {
-            throw new TestLinkAPIException("Error retrieving test cases for build: " + xmlrpcex.getMessage(), xmlrpcex);
-        } catch (JSONException jsonex) {
-        	return new TestCase []{};
+		TestCase[] testCases = null;
+
+		try {
+			Map<String, Object> executionData = new HashMap<String, Object>();
+			executionData.put(TestLinkParams.PROJECT_ID.toString(), projectId);
+			executionData.put(TestLinkParams.BUILD_ID.toString(), buildId);
+
+			Object response = this.executeXmlRpcCall(TestLinkMethods.GET_FAILED_TEST_CASES_BY_BUILD.toString(),
+					executionData);
+			Object[] responseArray = Util.castToArray(response);
+
+			testCases = new TestCase[responseArray.length];
+
+			for (int i = 0; i < responseArray.length; i++) {
+				Map<String, Object> responseMap = (Map<String, Object>) responseArray[i];
+				testCases[i] = Util.getTestCase(responseMap);
+			}
+		} catch (XmlRpcException xmlrpcex) {
+			throw new TestLinkAPIException("Error retrieving test cases for build: " + xmlrpcex.getMessage(), xmlrpcex);
 		}
-    }
+
+		return testCases;
+	}
 
     /**
      * @param testPlanId
