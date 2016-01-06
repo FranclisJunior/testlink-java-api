@@ -260,7 +260,7 @@ class TestProjectService extends BaseService {
 	public void assignUserToProject(Integer projectBDId, String username, TestProjectRole role) throws TestLinkAPIException {
 		
 		Map<String, Object> executionData = new HashMap<String, Object>();
-		executionData.put(TestLinkParams.PROJECT_ID.toString(), projectBDId);
+		executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), projectBDId);
 		executionData.put(TestLinkParams.USER.toString(), username);
 		executionData.put(TestLinkParams.ROLE.toString(), role.toString());
 		

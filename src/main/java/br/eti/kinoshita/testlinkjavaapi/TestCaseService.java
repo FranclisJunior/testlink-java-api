@@ -240,7 +240,7 @@ class TestCaseService extends BaseService {
 
 		try {
 			Map<String, Object> executionData = new HashMap<String, Object>();
-			executionData.put(TestLinkParams.PROJECT_ID.toString(), projectId);
+			executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), projectId);
 			executionData.put(TestLinkParams.BUILD_ID.toString(), buildId);
 
 			Object response = this.executeXmlRpcCall(TestLinkMethods.GET_FAILED_TEST_CASES_BY_BUILD.toString(),

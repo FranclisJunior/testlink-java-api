@@ -95,7 +95,6 @@ public enum TestLinkParams {
     PLATFORM_ID("platformid"), 
     PLATFORM_NAME("platformname"), 
     PRECONDITIONS("preconditions"),
-    PROJECT_ID("projectId"),
     PUBLIC("public"), 
     REQUIREMENT_SPECIFICATION_ID("reqspecid"),
     REQUIREMENT_ID("requirementid"), 

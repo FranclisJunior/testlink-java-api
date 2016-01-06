@@ -115,6 +115,34 @@ class TestPlanService extends BaseService {
     }
 
     /**
+     * Retrieves a Test Plan by its id.
+     * 
+     * @param testprojectid Test Project id.
+     * @param testplanid Test Plan id.
+     * @return Test Plan.
+     * @throws TestLinkAPIException
+     */
+    protected TestPlan getTestPlanById(Integer testprojectid, Integer testplanid)
+            throws TestLinkAPIException {
+        TestPlan testPlan = null;
+
+        try {
+            Map<String, Object> executionData = new HashMap<String, Object>();
+            executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), testprojectid);
+            executionData.put(TestLinkParams.TEST_PLAN_ID.toString(), testplanid);
+
+            Object response = this.executeXmlRpcCall(TestLinkMethods.GET_TEST_PLAN_BY_ID.toString(), executionData);
+            Map<String, Object> responseMap = (Map<String, Object>) response;
+
+            testPlan = Util.getTestPlan(responseMap);
+        } catch (XmlRpcException xmlrpcex) {
+            throw new TestLinkAPIException("Error getting test plan: " + xmlrpcex.getMessage(), xmlrpcex);
+        }
+
+        return testPlan;
+    }
+
+    /**
      * @param planId
      * @return
      */

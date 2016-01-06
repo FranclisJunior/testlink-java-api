@@ -568,6 +568,19 @@ public class TestLinkAPI {
     }
 
     /**
+     * Retrieves a Test Plan by its id.
+     * 
+     * @param testprojectid Test Project id.
+     * @param testplanid Test Plan id.
+     * @return Test Plan.
+     * @throws TestLinkAPIException
+     * @since 1.0
+     */
+    public TestPlan getTestPlanById(Integer testprojectid, Integer testplanid) throws TestLinkAPIException {
+        return this.testPlanService.getTestPlanById(testprojectid, testplanid);
+    }
+
+    /**
      * Retrieves Platforms of a Test Plan.
      * 
      * @param planId Test Plan Id.

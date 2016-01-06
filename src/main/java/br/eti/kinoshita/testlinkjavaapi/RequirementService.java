@@ -115,7 +115,7 @@ class RequirementService extends BaseService {
 			throws TestLinkAPIException {
 		try {
 			Map<String, Object> executionData = new HashMap<String, Object>();
-			executionData.put(TestLinkParams.PROJECT_ID.toString(), projectId);
+			executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), projectId);
 			executionData.put(TestLinkParams.EXTERNAL_ID.toString(), externalId);
 			executionData.put(TestLinkParams.NAME.toString(), name);
 			
