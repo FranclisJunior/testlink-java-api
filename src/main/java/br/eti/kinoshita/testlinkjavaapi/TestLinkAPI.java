@@ -872,7 +872,7 @@ public class TestLinkAPI {
      * @param assignedTo
      * @param executeStatus
      * @param executionType
-     * @param getStepInfo
+     * @param getStepIgetTestnfo
      * @return Array of Test Cases of the Test Plan.
      * @throws TestLinkAPIException
      */
@@ -883,8 +883,21 @@ public class TestLinkAPI {
         return this.testCaseService.getTestCasesForTestPlan(testPlanId, testCasesIds, buildId, keywordsIds, keywords,
                 executed, assignedTo, executeStatus, executionType, getStepInfo, detail);
     }
-    
-    
+
+    /**
+     * Retrieves Test Cases executions.
+     * 
+     * @param testProjectId
+     * @param buildId
+     * @param requirementId
+     * @return Array of Test Cases.
+     * @throws TestLinkAPIException
+     */
+    public TestCase[] getTestCasesExecutions(Integer testProjectId, Integer buildId, Integer requirementId)
+    		throws TestLinkAPIException {
+        return this.testCaseService.getTestCasesExecutions(testProjectId, buildId, requirementId);
+    }
+
     /**
      * Retrieves Test Cases by build
      * 
