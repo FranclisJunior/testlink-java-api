@@ -367,6 +367,56 @@ class TestCaseService extends BaseService {
     }
 
     /**
+     * @param testProjectId
+     * @param requirementId
+     * @return
+     * @throws TestLinkAPIException
+     */
+    protected Integer getTestCasesCountByRequirementId(Integer testProjectId, Integer requirementId) {
+        try {
+            Map<String, Object> executionData = new HashMap<String, Object>();
+            executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), testProjectId);
+            executionData.put(TestLinkParams.REQUIREMENT_ID.toString(), requirementId);
+            
+            Object response = this.executeXmlRpcCall(TestLinkMethods.GET_TEST_CASES_COUNT_BY_REQUIREMENT_ID.toString(), executionData);
+
+			return (Integer) response;
+        } catch (XmlRpcException xmlrpcex) {
+            throw new TestLinkAPIException("Error retrieving test cases count: " + xmlrpcex.getMessage(), xmlrpcex);
+        }
+    }
+
+    /**
+     * @param testProjectId
+     * @param requirementId
+     * @return
+     * @throws TestLinkAPIException
+     */
+    protected TestCase[] getTestCasesByRequirementId(Integer testProjectId, Integer requirementId) {
+    	TestCase[] testCases = null;
+
+        try {
+            Map<String, Object> executionData = new HashMap<String, Object>();
+            executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), testProjectId);
+            executionData.put(TestLinkParams.REQUIREMENT_ID.toString(), requirementId);
+            
+            Object response = this.executeXmlRpcCall(TestLinkMethods.GET_TEST_CASES_BY_REQUIREMENT_ID.toString(), executionData);
+			Object[] responseArray = Util.castToArray(response);
+
+			testCases = new TestCase[responseArray.length];
+
+			for (int i = 0; i < responseArray.length; i++) {
+				Map<String, Object> responseMap = (Map<String, Object>) responseArray[i];
+				testCases[i] = Util.getTestCase(responseMap);
+			}
+        } catch (XmlRpcException xmlrpcex) {
+            throw new TestLinkAPIException("Error retrieving test cases executions: " + xmlrpcex.getMessage(), xmlrpcex);
+        }
+
+        return testCases;
+    }
+
+    /**
      * 
      * @param testCaseId
      * @param testCaseExternalId

@@ -899,6 +899,32 @@ public class TestLinkAPI {
     }
 
     /**
+     * Retrieves Test Cases count by requirement id.
+     * 
+     * @param testProjectId
+     * @param requirementId
+     * @return Integer
+     * @throws TestLinkAPIException
+     */
+    public Integer getTestCasesCountByRequirementId(Integer testProjectId, Integer requirementId)
+    		throws TestLinkAPIException {
+        return this.testCaseService.getTestCasesCountByRequirementId(testProjectId, requirementId);
+    }
+
+    /**
+     * Retrieves Test Cases by requirement id.
+     * 
+     * @param testProjectId
+     * @param requirementId
+     * @return Array of Test Cases.
+     * @throws TestLinkAPIException
+     */
+    public TestCase[] getTestCasesByRequirementId(Integer testProjectId, Integer requirementId)
+    		throws TestLinkAPIException {
+        return this.testCaseService.getTestCasesByRequirementId(testProjectId, requirementId);
+    }
+
+    /**
      * Retrieves Test Cases by build
      * 
      * @param projectId
