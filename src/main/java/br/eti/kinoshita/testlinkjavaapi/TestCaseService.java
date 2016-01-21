@@ -417,6 +417,34 @@ class TestCaseService extends BaseService {
     }
 
     /**
+     * @param testProjectId
+     * @return
+     * @throws TestLinkAPIException
+     */
+    protected TestCase[] getNotMappedTestCases(Integer testProjectId) {
+    	TestCase[] testCases = null;
+
+        try {
+            Map<String, Object> executionData = new HashMap<String, Object>();
+            executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), testProjectId);
+            
+            Object response = this.executeXmlRpcCall(TestLinkMethods.GET_NOT_MAPPED_TEST_CASES.toString(), executionData);
+			Object[] responseArray = Util.castToArray(response);
+
+			testCases = new TestCase[responseArray.length];
+
+			for (int i = 0; i < responseArray.length; i++) {
+				Map<String, Object> responseMap = (Map<String, Object>) responseArray[i];
+				testCases[i] = Util.getTestCase(responseMap);
+			}
+        } catch (XmlRpcException xmlrpcex) {
+            throw new TestLinkAPIException("Error retrieving test cases executions: " + xmlrpcex.getMessage(), xmlrpcex);
+        }
+
+        return testCases;
+    }
+
+    /**
      * 
      * @param testCaseId
      * @param testCaseExternalId

@@ -68,6 +68,7 @@ public enum TestLinkMethods {
     GET_TEST_CASES_EXECUTIONS("tl.getTestCasesExecutions"), 
     GET_TEST_CASES_COUNT_BY_REQUIREMENT_ID("tl.getTestCasesCountByRequirementId"), 
     GET_TEST_CASES_BY_REQUIREMENT_ID("tl.getTestCasesByRequirementId"),
+    GET_NOT_MAPPED_TEST_CASES("tl.getNotMappedTestCases"),
     GET_TEST_CASE_ID_BY_NAME("tl.getTestCaseIDByName"),
     GET_TEST_PLAN_BY_NAME("tl.getTestPlanByName"),
     GET_TEST_PLAN_BY_ID("tl.getTestPlanById"),
