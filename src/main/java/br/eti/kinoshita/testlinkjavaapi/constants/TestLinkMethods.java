@@ -93,7 +93,8 @@ public enum TestLinkMethods {
     UPLOAD_REQUIREMENT_SPECIFICATION_ATTACHMENT("tl.uploadRequirementSpecificationAttachment"), 
     UPLOAD_TEST_CASE_ATTACHMENT("tl.uploadTestCaseAttachment"), 
     UPLOAD_TEST_SUITE_ATTACHMENT("tl.uploadTestSuiteAttachment"), 
-    UPLOAD_TEST_PROJECT_ATTACHMENT("tl.uploadTestProjectAttachment");
+    UPLOAD_TEST_PROJECT_ATTACHMENT("tl.uploadTestProjectAttachment"),
+    GET_MAPPED_REQUIREMENTS_BY_TEST_CASE_ID("tl.getMappedRequirementsByTestCaseId");
     
 
     private String value;

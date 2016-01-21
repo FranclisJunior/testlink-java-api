@@ -1230,6 +1230,19 @@ public class TestLinkAPI {
     }
 
     /**
+     * Retrieves mapped Requirements by Test Case id.
+     * 
+     * @param testProjectId
+     * @param testCaseId
+     * @return Array of Requirements.
+     * @throws TestLinkAPIException
+     */
+    public Requirement[] getMappedRequirementsByTestCaseId(Integer testProjectId, Integer testCaseId)
+    		throws TestLinkAPIException {
+        return this.requirementService.getMappedRequirementsByTestCaseId(testProjectId, testCaseId);
+    }
+
+    /**
      * Executes a XML-RPC call. Use this method to talk with TestLink in a lower level.
      * 
      * @param methodName Name of the method.

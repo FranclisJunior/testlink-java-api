@@ -110,6 +110,36 @@ class RequirementService extends BaseService {
 					xmlrpcex);
 		}
 	}
+
+    /**
+     * @param testProjectId
+     * @param testCaseId
+     * @return
+     * @throws TestLinkAPIException
+     */
+    protected Requirement[] getMappedRequirementsByTestCaseId(Integer testProjectId, Integer testCaseId) {
+    	Requirement[] requirements = null;
+
+        try {
+            Map<String, Object> executionData = new HashMap<String, Object>();
+            executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), testProjectId);
+            executionData.put(TestLinkParams.TEST_CASE_ID.toString(), testCaseId);
+            
+            Object response = this.executeXmlRpcCall(TestLinkMethods.GET_MAPPED_REQUIREMENTS_BY_TEST_CASE_ID.toString(), executionData);
+			Object[] responseArray = Util.castToArray(response);
+
+			requirements = new Requirement[responseArray.length];
+
+			for (int i = 0; i < responseArray.length; i++) {
+				Map<String, Object> responseMap = (Map<String, Object>) responseArray[i];
+				requirements[i] = Util.getRequirement(responseMap);
+			}
+        } catch (XmlRpcException xmlrpcex) {
+            throw new TestLinkAPIException("Error retrieving test cases executions: " + xmlrpcex.getMessage(), xmlrpcex);
+        }
+
+        return requirements;
+    }
 	
 	protected Integer createRequirement(Integer projectId, Integer externalId, String name) 
 			throws TestLinkAPIException {

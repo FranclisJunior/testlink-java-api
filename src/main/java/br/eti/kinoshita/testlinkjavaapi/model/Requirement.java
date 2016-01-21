@@ -39,6 +39,7 @@ public class Requirement implements Serializable {
 	private Integer projectId;
 	private Integer externalId;
 	private String name;
+	private Integer testCasesCount;
 
 	/**
 	 * 
@@ -126,6 +127,14 @@ public class Requirement implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Integer getTestCasesCount() {
+		return testCasesCount;
+	}
+
+	public void setTestCasesCount(Integer testCasesCount) {
+		this.testCasesCount = testCasesCount;
 	}
 
 	/*

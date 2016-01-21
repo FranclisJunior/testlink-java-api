@@ -546,6 +546,36 @@ public final class Util {
 
     /**
      * @param map
+     * @return Requirement.
+     */
+    public static final Requirement getRequirement(Map<String, Object> map) {
+    	Requirement requirement = null;
+        if (map != null && map.size() > 0) {
+            // IMPORTANT: http://mantis.testlink.org/view.php?id=4784
+            // Different methods to recover test cases use different parameter
+            // names for the id, some uses "id" and others "testcase_id".
+            Object o = map.get(TestLinkResponseParams.ID.toString());
+
+            if (o != null) {
+                Integer id = Integer.parseInt(o.toString());
+
+                if (id > 0) {
+                    requirement = new Requirement();
+                    requirement.setId(id);
+                    requirement.setReqSpecId(getInteger(map, TestLinkResponseParams.REQ_SPEC_DOC_ID.toString()));
+                    requirement.setReqDocId(getString(map, TestLinkResponseParams.REQ_DOC_ID.toString()));
+                    requirement.setProjectId(getInteger(map, TestLinkResponseParams.TEST_PROJECT_ID.toString()));
+                    requirement.setName(getString(map, TestLinkResponseParams.TITLE.toString()));
+                    requirement.setTestCasesCount(getInteger(map, TestLinkResponseParams.TEST_CASES_COUNT.toString()));
+                }
+
+            }
+        }
+        return requirement;
+    }
+
+    /**
+     * @param map
      * @param key
      * @return Array of objects.
      */
