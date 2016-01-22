@@ -41,6 +41,7 @@ import org.apache.commons.lang.StringUtils;
 
 import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionStatus;
 import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionType;
+import br.eti.kinoshita.testlinkjavaapi.constants.TestImportance;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkParams;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkResponseParams;
 import br.eti.kinoshita.testlinkjavaapi.model.Attachment;
@@ -471,6 +472,10 @@ public final class Util {
                     testCase.setExecutionOrder(getInteger(map, TestLinkResponseParams.EXECUTION_ORDER.toString()));
                     // the name of the test case is not always in the same parameter
                     String testCaseName = getString(map, TestLinkResponseParams.TCASE_NAME.toString());
+                    
+                    TestImportance importance = TestImportance.valueOf(getString(map, TestLinkResponseParams.IMPORTANCE.toString()));
+                    testCase.setTestImportance(importance);
+                    
                     if (testCaseName == null) {
                         testCaseName = getString(map, TestLinkResponseParams.NAME.toString());
                     }

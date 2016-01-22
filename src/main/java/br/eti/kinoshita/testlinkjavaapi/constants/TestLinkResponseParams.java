@@ -117,7 +117,8 @@ public enum TestLinkResponseParams {
     REQ_SPEC_DOC_ID("req_spec_doc_id"),
     REQ_DOC_ID("req_doc_id"),
     TEST_PROJECT_ID("testproject_id"),
-    TEST_CASES_COUNT("test_cases_count");
+    TEST_CASES_COUNT("test_cases_count"),
+	IMPORTANCE("importance");
 
     private String textValue;
 
