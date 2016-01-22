@@ -35,5 +35,15 @@ public enum TestImportance {
     public Integer getValue() {
 	return this.value;
     }
+    
+    
+    public static TestImportance valueOf(Integer value) {
+    	for (TestImportance importance : TestImportance.values()) {
+    		if(importance.value == value) {
+    			return importance;
+    		}
+    	}
+    	return null;
+    }
 
 }

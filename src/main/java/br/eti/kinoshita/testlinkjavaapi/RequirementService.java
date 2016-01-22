@@ -117,7 +117,8 @@ class RequirementService extends BaseService {
      * @return
      * @throws TestLinkAPIException
      */
-    protected Requirement[] getMappedRequirementsByTestCaseId(Integer testProjectId, Integer testCaseId) {
+    @SuppressWarnings("unchecked")
+	protected Requirement[] getMappedRequirementsByTestCaseId(Integer testProjectId, Integer testCaseId) {
     	Requirement[] requirements = null;
 
         try {
