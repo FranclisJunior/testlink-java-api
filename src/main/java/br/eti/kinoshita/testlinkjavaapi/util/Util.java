@@ -472,11 +472,14 @@ public final class Util {
                     testCase.setExecutionOrder(getInteger(map, TestLinkResponseParams.EXECUTION_ORDER.toString()));
                     // the name of the test case is not always in the same parameter
                     String testCaseName = getString(map, TestLinkResponseParams.TCASE_NAME.toString());
-
-                    Integer importanceValue = Integer.valueOf(getString(map, TestLinkResponseParams.IMPORTANCE.toString()));
-                    TestImportance importance = TestImportance.valueOf(importanceValue);
-                    testCase.setTestImportance(importance);
                     
+                    String importanceString = getString(map, TestLinkResponseParams.IMPORTANCE.toString());
+                    if (importanceString != null) {
+                        Integer importanceValue = Integer.valueOf(getString(map, TestLinkResponseParams.IMPORTANCE.toString()));
+                        TestImportance importance = TestImportance.valueOf(importanceValue);
+                        testCase.setTestImportance(importance);
+                    }
+
                     if (testCaseName == null) {
                         testCaseName = getString(map, TestLinkResponseParams.NAME.toString());
                     }
