@@ -935,6 +935,18 @@ public class TestLinkAPI {
     		throws TestLinkAPIException {
         return this.testCaseService.getNotMappedTestCases(testProjectId);
     }
+    
+    /**
+     * Retrieves not mapped Test Cases.
+     * 
+     * @param testProjectId
+     * @return Array of Test Cases.
+     * @throws TestLinkAPIException
+     */
+    public TestCase[] getTestCasesByProjectId(Integer testProjectId)
+    		throws TestLinkAPIException {
+        return this.testCaseService.getTestCasesByProjectId(testProjectId);
+    }
 
     /**
      * Retrieves Test Cases by build
