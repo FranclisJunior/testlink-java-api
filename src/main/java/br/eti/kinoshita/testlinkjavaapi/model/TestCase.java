@@ -30,6 +30,7 @@ import java.util.List;
 import br.eti.kinoshita.testlinkjavaapi.constants.ActionOnDuplicate;
 import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionStatus;
 import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionType;
+import br.eti.kinoshita.testlinkjavaapi.constants.TestCaseStatus;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestImportance;
 
 /**
@@ -63,6 +64,7 @@ public class TestCase implements Serializable {
     private ExecutionStatus executionStatus;
     private Platform platform;
     private Integer featureId;
+    private TestCaseStatus status;
 
     /**
 	 * 
@@ -456,7 +458,15 @@ public class TestCase implements Serializable {
         this.featureId = featureId;
     }
 
-    /*
+    public TestCaseStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(TestCaseStatus status) {
+		this.status = status;
+	}
+
+	/*
      * (non-Javadoc)
      * 
      * @see java.lang.Object#toString()
@@ -470,7 +480,7 @@ public class TestCase implements Serializable {
                 + internalId + ", fullExternalId=" + fullExternalId + ", checkDuplicatedName=" + checkDuplicatedName
                 + ", actionOnDuplicatedName=" + actionOnDuplicatedName + ", versionId=" + versionId + ", version="
                 + version + ", parentId=" + parentId + ", customFields=" + customFields + ", executionStatus="
-                + executionStatus + ", platform=" + platform + ", featureId=" + featureId + "]";
+                + executionStatus + ", platform=" + platform + ", featureId=" + featureId +  ", status=" + status.name() + "]";
     }
 
 }

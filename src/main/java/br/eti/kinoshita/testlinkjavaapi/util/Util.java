@@ -41,6 +41,7 @@ import org.apache.commons.lang.StringUtils;
 
 import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionStatus;
 import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionType;
+import br.eti.kinoshita.testlinkjavaapi.constants.TestCaseStatus;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestImportance;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkParams;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkResponseParams;
@@ -475,9 +476,16 @@ public final class Util {
                     
                     String importanceString = getString(map, TestLinkResponseParams.IMPORTANCE.toString());
                     if (importanceString != null) {
-                        Integer importanceValue = Integer.valueOf(getString(map, TestLinkResponseParams.IMPORTANCE.toString()));
+                        Integer importanceValue = Integer.valueOf(importanceString);
                         TestImportance importance = TestImportance.valueOf(importanceValue);
                         testCase.setTestImportance(importance);
+                    }
+                    
+                    String statusString = getString(map, TestLinkResponseParams.STATUS.toString());
+                    if(statusString != null) {
+                    	Integer statusValue = Integer.valueOf(statusString);
+                    	TestCaseStatus status = TestCaseStatus.valueOf(statusValue);
+                    	testCase.setStatus(status);
                     }
 
                     if (testCaseName == null) {

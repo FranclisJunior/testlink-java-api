@@ -29,8 +29,13 @@ package br.eti.kinoshita.testlinkjavaapi.constants;
  */
 public enum TestCaseStatus {
     
-    FINAL(7), FUTURE(6), OBSOLETE(5), REWORK(4), REVIEW_IN_PROGRESS(3), READY_FOR_REVIEW(
-	    2), DRAFT(1);
+    FINAL(7), 
+    FUTURE(6), 
+    OBSOLETE(5), 
+    REWORK(4), 
+    REVIEW_IN_PROGRESS(3),
+    READY_FOR_REVIEW(2),
+    DRAFT(1);
 
     private Integer value;
 
@@ -44,5 +49,14 @@ public enum TestCaseStatus {
 
     public String toString() {
 	return this.value.toString();
+    }
+    
+    public static TestCaseStatus valueOf(Integer value) {
+    	for (TestCaseStatus status : TestCaseStatus.values()) {
+    		if(status.value == value) {
+    			return status;
+    		}
+    	}
+    	return null;
     }
 }
