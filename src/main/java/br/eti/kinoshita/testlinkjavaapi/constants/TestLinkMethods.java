@@ -96,8 +96,10 @@ public enum TestLinkMethods {
     UPLOAD_TEST_CASE_ATTACHMENT("tl.uploadTestCaseAttachment"), 
     UPLOAD_TEST_SUITE_ATTACHMENT("tl.uploadTestSuiteAttachment"), 
     UPLOAD_TEST_PROJECT_ATTACHMENT("tl.uploadTestProjectAttachment"),
-    GET_MAPPED_REQUIREMENTS_BY_TEST_CASE_ID("tl.getMappedRequirementsByTestCaseId");
-    
+    GET_MAPPED_REQUIREMENTS_BY_TEST_CASE_ID("tl.getMappedRequirementsByTestCaseId"),
+    UPDATE_TEST_CASE("tl.updateTestCase"),     
+    GET_TEST_CASE_KEYWORDS("tl.getTestCaseKeywords"),
+    GET_TEST_PLAN_CUSTOM_FIELD_DESIGN_VALUE("tl.getTestPlanCustomFieldDesignValue");
 
     private String value;
 
@@ -110,3 +112,4 @@ public enum TestLinkMethods {
 	}
 
 }
+

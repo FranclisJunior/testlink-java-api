@@ -23,42 +23,43 @@
  */
 package br.eti.kinoshita.testlinkjavaapi.testcase;
 
+import java.util.List;
+
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import br.eti.kinoshita.testlinkjavaapi.BaseTest;
-import br.eti.kinoshita.testlinkjavaapi.model.TestCase;
 import br.eti.kinoshita.testlinkjavaapi.util.TestLinkAPIException;
 
 /**
- * @author Bruno P. Kinoshita - http://www.kinoshita.eti.br
- * @since 1.0
+ * @author s2o
+ * @since
  */
-public class TestCreateTestCase extends BaseTest {
+public class TestGetTestCaseKeywords extends BaseTest {
 
-    @DataProvider(name = "testCaseData")
+    @DataProvider(name = "testGetTestCaseKeywords")
     public Object[][] createData() {
-        return new Object[][] { { 2, 1, "admin", "Sample summary.", "No preconditions." } };
+        return new Object[][] { { 1,1 } };
     }
 
-    @Test(dataProvider = "testCaseData")
-    public void testCreateTestCase(Integer testSuiteId, Integer testProjectId, String authorLogin, String summary,
-            String preconditions) {
-        this.loadXMLRPCMockData("tl.createTestCase.xml");
+    @Test(dataProvider = "testGetTestCaseKeywords")
+    public void testGetTestCaseKeywords(Integer testProjectId, Integer testCaseId) {
+        this.loadXMLRPCMockData("tl.getTestCaseKeywords.xml");
 
-        TestCase testCase = null;
+        List<String> keywords = null;
 
         try {
-            testCase = api.createTestCase("Sample Test Case " + System.currentTimeMillis(), testSuiteId, testProjectId,
-                    authorLogin, summary, null, preconditions, null, null, null, null, null, null, null);
+        	keywords = this.api.getTestCaseKeywords(testProjectId, testCaseId);
         } catch (TestLinkAPIException e) {
             Assert.fail(e.getMessage(), e);
         }
 
-        Assert.assertNotNull(testCase);
+        Assert.assertNotNull(keywords);
 
-        Assert.assertTrue(testCase.getId() > 0);
-    }
+        Assert.assertTrue(keywords.size() > 0);
 
+        Assert.assertNotNull(keywords.get(0));
+        
+    }   
 }

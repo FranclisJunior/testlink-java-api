@@ -118,7 +118,8 @@ public enum TestLinkResponseParams {
     REQ_DOC_ID("req_doc_id"),
     TEST_PROJECT_ID("testproject_id"),
     TEST_CASES_COUNT("test_cases_count"),
-	IMPORTANCE("importance");
+	IMPORTANCE("importance"),
+    EST_EXECUTION_DURATION("estimated_exec_duration");
 
     private String textValue;
 

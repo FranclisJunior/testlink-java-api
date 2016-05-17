@@ -23,7 +23,9 @@
  */
 package br.eti.kinoshita.testlinkjavaapi;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -37,6 +39,7 @@ import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionStatus;
 import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionType;
 import br.eti.kinoshita.testlinkjavaapi.constants.ResponseDetails;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestCaseDetails;
+import br.eti.kinoshita.testlinkjavaapi.constants.TestCaseStatus;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestCaseStepAction;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestImportance;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkMethods;
@@ -53,7 +56,7 @@ import br.eti.kinoshita.testlinkjavaapi.util.Util;
 
 /**
  * Class responsible for Test Case services.
- * 
+ *
  * @author Bruno P. Kinoshita - http://www.kinoshita.eti.br
  * @since 1.9.0-1
  */
@@ -70,7 +73,7 @@ class TestCaseService extends BaseService {
 
     /**
      * Creates a Test Case.
-     * 
+     *
      * @param testCaseName
      * @param testSuiteId
      * @param testProjectId
@@ -78,6 +81,7 @@ class TestCaseService extends BaseService {
      * @param summary
      * @param steps
      * @param preconditions
+     * @param status
      * @param importance
      * @param execution
      * @param order
@@ -88,7 +92,7 @@ class TestCaseService extends BaseService {
      * @throws TestLinkAPIException
      */
     protected TestCase createTestCase(String testCaseName, Integer testSuiteId, Integer testProjectId,
-            String authorLogin, String summary, List<TestCaseStep> steps, String preconditions,
+            String authorLogin, String summary, List<TestCaseStep> steps, String preconditions, TestCaseStatus status,
             TestImportance importance, ExecutionType execution, Integer order, Integer internalId,
             Boolean checkDuplicatedName, ActionOnDuplicate actionOnDuplicatedName) throws TestLinkAPIException {
         TestCase testCase = null;
@@ -96,7 +100,7 @@ class TestCaseService extends BaseService {
         Integer id = null;
 
         testCase = new TestCase(id, testCaseName, testSuiteId, testProjectId, authorLogin, summary, steps,
-                preconditions, importance, execution, null, order, internalId, null, checkDuplicatedName,
+                preconditions, status, importance, execution, null, order, internalId, null, checkDuplicatedName,
                 actionOnDuplicatedName, null, null, null, null, null, null, null);
 
         try {
@@ -104,15 +108,37 @@ class TestCaseService extends BaseService {
             Object response = this.executeXmlRpcCall(TestLinkMethods.CREATE_TEST_CASE.toString(), executionData);
             Object[] responseArray = Util.castToArray(response);
             Map<String, Object> responseMap = (Map<String, Object>) responseArray[0];
-
+            
+            Integer version = (Integer)((HashMap<String, Object>) responseMap.get("additionalInfo")).get("version_number");
             id = Util.getInteger(responseMap, TestLinkResponseParams.ID.toString());
             testCase.setId(id);
+            testCase.setVersion(version);
         } catch (XmlRpcException xmlrpcex) {
             throw new TestLinkAPIException("Error creating test case : " + xmlrpcex.getMessage(), xmlrpcex);
         }
 
         return testCase;
     }
+
+    public Map<String, Object> updateTestCase(TestCase tc) throws TestLinkAPIException {
+        try {
+            Map<String, Object> responseMap = null;
+            Map<String, Object> executionData = Util.getTestCaseMap(tc);
+            Object response = this.executeXmlRpcCall(TestLinkMethods.UPDATE_TEST_CASE.toString(), executionData);
+            if (response instanceof Object[]) {
+                Object[] arr = (Object[]) response;
+                if (arr.length > 0 && arr[0] instanceof Map<?, ?>) {
+                    responseMap = (Map<String, Object>) arr[0];
+                }
+            } else {
+                responseMap = (Map<String, Object>) response;
+            }
+            return responseMap;
+        } catch (XmlRpcException xmlrpcex) {
+            throw new TestLinkAPIException("Error updating test case: " + xmlrpcex.getMessage(), xmlrpcex);
+        }
+    }
+
 
     public Map<String, Object> createTestCaseSteps(Integer testCaseId, String testCaseExternalId, Integer version,
             TestCaseStepAction action, List<TestCaseStep> testCaseSteps) throws TestLinkAPIException {
@@ -197,7 +223,6 @@ class TestCaseService extends BaseService {
     /**
      * @param testSuiteId
      * @param deep
-     * @param DETAILS
      * @return
      */
     protected TestCase[] getTestCasesForTestSuite(Integer testSuiteId, Boolean deep, TestCaseDetails detail)
@@ -303,8 +328,9 @@ class TestCaseService extends BaseService {
 
             Map<String, Object> responseMap = Util.castToMap(response);
             Set<Entry<String, Object>> entrySet = responseMap.entrySet();
-            testCases = new TestCase[entrySet.size()];
-            int index = 0;
+            
+            List<TestCase> testCasesList = new ArrayList<TestCase>();
+            
             for (Entry<String, Object> entry : entrySet) {
                 String key = entry.getKey();
                 Map<String, Object> testCaseMap = null;
@@ -312,20 +338,36 @@ class TestCaseService extends BaseService {
                 if (entry.getValue() instanceof Object[]) {
                     Object[] responseArray = (Object[]) entry.getValue();
                     testCaseMap = (Map<String, Object>) responseArray[0];
+                    
+                    testCaseMap.put(TestLinkResponseParams.ID.toString(), key);
+                    testCasesList.add( Util.getTestCase(testCaseMap));
+                    
                 } else if (entry.getValue() instanceof Map<?, ?>) {
                     testCaseMap = (Map<String, Object>) entry.getValue();
                     if (testCaseMap.size() > 0) {
                         Set<String> keys = testCaseMap.keySet();
-                        Object o = testCaseMap.get(keys.iterator().next());
-                        if (o instanceof Map<?, ?>) {
-                            testCaseMap = (Map<String, Object>) o;
+                        Iterator<String> it = keys.iterator();
+                        while (it.hasNext()){
+                        	Object o = testCaseMap.get(it.next());
+                        
+	                        if (o instanceof Map<?, ?>) {
+	                        	Map<String, Object> testCaseMapTmp = (Map<String, Object>) o;	                        
+	                        	testCaseMapTmp.put(TestLinkResponseParams.ID.toString(), key);
+	                        	testCasesList.add( Util.getTestCase(testCaseMapTmp) );
+	                        }
                         }
+                    } else {
+                        testCaseMap.put(TestLinkResponseParams.ID.toString(), key);
+                        testCasesList.add( Util.getTestCase(testCaseMap) );
                     }
-                }
-                testCaseMap.put(TestLinkResponseParams.ID.toString(), key);
-                testCases[index] = Util.getTestCase(testCaseMap);
-                index += 1;
+                }    
             }
+
+            testCases = new TestCase[testCasesList.size()];
+            for (int i = 0 ; i <  testCasesList.size() ; i++ ){
+            	testCases[i] = testCasesList.get(i);
+            }
+            
         } catch (XmlRpcException xmlrpcex) {
             throw new TestLinkAPIException("Error retrieving test cases for test plan: " + xmlrpcex.getMessage(),
                     xmlrpcex);
@@ -334,7 +376,9 @@ class TestCaseService extends BaseService {
         return testCases;
     }
 
+    
     /**
+<<<<<<< HEAD
      * @param testProjectId
      * @param buildId
      * @param requirementId
@@ -508,6 +552,9 @@ class TestCaseService extends BaseService {
 
     /**
      * 
+=======
+     *
+>>>>>>> upstream/master
      * @param testCaseId
      * @param testCaseExternalId
      * @param version
@@ -539,7 +586,7 @@ class TestCaseService extends BaseService {
     }
 
     /**
-     * 
+     *
      * @param fullTestCaseExternalId Full external id: prefix-externalId
      * @param version
      * @return
@@ -569,13 +616,11 @@ class TestCaseService extends BaseService {
     }
 
     /**
-     * 
-     * @param DEV_KEY
      * @param testCaseName
      * @param testSuiteName
      * @param testProjectName
      * @param testCasePathName
-     * @return
+     * @return Integer
      * @throws TestLinkAPIException
      */
     protected Integer getTestCaseIDByName(String testCaseName, String testSuiteName, String testProjectName,
@@ -593,13 +638,18 @@ class TestCaseService extends BaseService {
             Object response = this
                     .executeXmlRpcCall(TestLinkMethods.GET_TEST_CASE_ID_BY_NAME.toString(), executionData);
 
-            Object[] responseArray = Util.castToArray(response);
-            Map<String, Object> responseMap = (Map<String, Object>) responseArray[0];
-
+            Map<String, Object> responseMap;
+            if (response instanceof HashMap) {
+                Map<String, Object> hm = (HashMap<String, Object>)response;
+                responseMap = (Map<String, Object>)hm.get(hm.keySet().toArray()[0]);
+            } else {
+                Object[] responseArray = Util.castToArray(response);
+                responseMap = (Map<String, Object>) responseArray[0];
+            }
             testCaseID = Util.getInteger(responseMap, TestLinkResponseParams.ID.toString());
         } catch (XmlRpcException xmlrpcex) {
             throw new TestLinkAPIException("Error getting test case ID : " + xmlrpcex.getMessage(), xmlrpcex);
-        }
+        } 
 
         return testCaseID;
     }
@@ -741,7 +791,7 @@ class TestCaseService extends BaseService {
      */
     protected ReportTCResultResponse reportTCResult(Integer testCaseId, Integer testCaseExternalId, Integer testPlanId,
             ExecutionStatus status, Integer buildId, String buildName, String notes, Boolean guess, String bugId,
-            Integer platformId, String platformName, Map<String, String> customFields, 
+            Integer platformId, String platformName, Map<String, String> customFields,
             Boolean overwrite) throws TestLinkAPIException {
         // TODO: Map<String, String> customFields => 
         // change for a list of custom fields. After implementing method getTestCaseCustomFieldDesignValue this
@@ -910,6 +960,39 @@ class TestCaseService extends BaseService {
         return customField;
     }
     
+	/**
+	 * Gets list of keywords for a given Test case
+	 * 
+	 * @param testCaseId
+	 * @param testCaseExternalId
+	 * @param version
+	 * @return
+	 * @throws TestLinkAPIException
+	 */
+	protected List<String> getTestCaseKeywords(Integer testProjectId, Integer testCaseId) throws TestLinkAPIException {
+		List<String> keywords = new ArrayList<String>();
+
+		try {
+			Map<String, Object> executionData = new HashMap<String, Object>();
+
+			executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), testProjectId);
+			executionData.put(TestLinkParams.TEST_CASE_ID.toString(), testCaseId);
+
+			Object response = this.executeXmlRpcCall(TestLinkMethods.GET_TEST_CASE_KEYWORDS.toString(), executionData);
+			Object[] responseArray = (Object[]) response;
+			for (Object keywordObject : responseArray) {
+				Map<String, String> keywordMap = (Map<String, String>) keywordObject;
+				keywords.add(keywordMap.get("keyword"));
+			}
+
+			// testCase = Util.getTestCase(responseMap);
+		} catch (XmlRpcException xmlrpcex) {
+			throw new TestLinkAPIException("Error getting test case info : " + xmlrpcex.getMessage(), xmlrpcex);
+		}
+
+		return keywords;
+	}
+	
     /**
      * @param testProjectId
      * @param testCaseExternalId
@@ -1005,3 +1088,4 @@ class TestCaseService extends BaseService {
     }
 
 }
+

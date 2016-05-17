@@ -44,6 +44,7 @@ import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionStatus;
 import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionType;
 import br.eti.kinoshita.testlinkjavaapi.constants.ResponseDetails;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestCaseDetails;
+import br.eti.kinoshita.testlinkjavaapi.constants.TestCaseStatus;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestCaseStepAction;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestImportance;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestProjectRole;
@@ -755,6 +756,7 @@ public class TestLinkAPI {
      * @param summary
      * @param steps
      * @param preconditions
+     * @param status
      * @param importance
      * @param execution
      * @param order
@@ -765,12 +767,22 @@ public class TestLinkAPI {
      * @throws TestLinkAPIException
      */
     public TestCase createTestCase(String testCaseName, Integer testSuiteId, Integer testProjectId, String authorLogin,
-            String summary, List<TestCaseStep> steps, String preconditions, TestImportance importance,
+            String summary, List<TestCaseStep> steps, String preconditions, TestCaseStatus status, TestImportance importance,
             ExecutionType execution, Integer order, Integer internalId, Boolean checkDuplicatedName,
             ActionOnDuplicate actionOnDuplicatedName) throws TestLinkAPIException {
         return this.testCaseService.createTestCase(testCaseName, testSuiteId, testProjectId, authorLogin, summary,
-                steps, preconditions, importance, execution, order, internalId, checkDuplicatedName,
+                steps, preconditions, status, importance, execution, order, internalId, checkDuplicatedName,
                 actionOnDuplicatedName);
+    }
+
+    /**
+     * Update an already existing test case with the data of the given test case as a new version.
+     * @param tc new version of the test case
+     * @return response map
+     * @throws TestLinkAPIException if updating the test case fails
+     */
+    public Map<String, Object> updateTestCase(TestCase tc) throws TestLinkAPIException {
+        return this.testCaseService.updateTestCase(tc);
     }
 
     /**
@@ -1109,6 +1121,21 @@ public class TestLinkAPI {
     }
 
     /**
+     * Gets the test plan custom field value
+     *
+     * @param testPlanId
+     * @param testProjectId
+     * @param customFieldName
+     * @param details
+     * @return
+     * @throws TestLinkAPIException
+     */
+    public CustomField getTestPlanCustomFieldDesignValue(Integer testPlanId, Integer testProjectId,
+                                                         String customFieldName, ResponseDetails details) throws TestLinkAPIException{
+        return this.testPlanService.getTestPlanCustomFieldDesignValue(testPlanId, testProjectId, customFieldName, details);
+    }
+
+    /**
      * Gets the test case custom field value on test plan design scope.
      * 
      * @param testCaseId
@@ -1147,6 +1174,18 @@ public class TestLinkAPI {
                 executionId, testProjectId, customFieldName, details);
     }
 
+    /**
+     *  Gets list of keywords for a given Test case
+     *  
+     * @param testProjectId
+     * @param testCaseId
+     * @return
+     * @throws TestLinkAPIException
+     */
+    public List<String> getTestCaseKeywords(Integer testProjectId, Integer testCaseId) throws TestLinkAPIException {
+		return this.testCaseService.getTestCaseKeywords(testProjectId, testCaseId);
+	}
+    
     /**
      * Sets the test case execution type.
      * 

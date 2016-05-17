@@ -1,9 +1,10 @@
 TestLink Java API
 =================
 
-PS: Replace file 'xmlrpc.class.php' on '/opt/testlink/apps/testlink/htdocs/lib/api/xmlrpc/v1/' by [a link](https://github.com/FranclisJunior/testlink-java-api/blob/master/src/main/resources/xmlrpc.class.php)
+PS: Replace file 'xmlrpc.class.php' on '/opt/testlink/apps/testlink/htdocs/lib/api/xmlrpc/v1/' (TestLink installation path) by 
+[xmlrpc.class.php](https://github.com/FranclisJunior/testlink-java-api/blob/master/src/main/resources/xmlrpc.class.php)
 
-Project homepage: http://testlinkjavaapi.sourceforge.net/
+Project homepage: http://kinow.github.io/testlink-java-api
 
 TestLink Java API is a Java API that interfaces TestLink XML-RPC API. This API lets you call TestLink internal methods such as createTestProject, uploadAttachment, getTestProjectByName among others.
 
