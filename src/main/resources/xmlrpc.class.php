@@ -80,6 +80,11 @@ class TestlinkXMLRPCServer extends IXR_Server
   protected $platformMgr = null;
 
 
+  // <MODIFICATION>
+  protected $buildMgr = null;
+  // </MODIFICATION>
+
+
   /** Whether the server will run in a testing mode */
   protected $testMode = false;
 
@@ -246,7 +251,13 @@ class TestlinkXMLRPCServer extends IXR_Server
     $this->tplanMetricsMgr = new tlTestPlanMetrics($this->dbObj);
     $this->reqSpecMgr = new requirement_spec_mgr($this->dbObj);
     $this->reqMgr = new requirement_mgr($this->dbObj);
-    
+
+
+    // <MODIFICATION>
+    $this->buildMgr = new build_mgr($this->dbObj);
+    // </MODIFICATION>
+
+
     $this->tprojectMgr->setAuditEventSource('API-XMLRPC');
       
 
@@ -3773,14 +3784,24 @@ public function getTestCase($args)
 
 
 
-  if( $status_ok )
-  {
+  if ( $status_ok ) {
     // before returning info need to understand if test case belongs to a test project
     // accessible to user requesting info
     // return $result[0]['id'];
     $this->args[self::$testProjectIDParamName] = $this->tcaseMgr->get_testproject($result[0]['id']);
     $status_ok = $this->userHasRight("mgt_view_tc",self::CHECK_PUBLIC_PRIVATE_ATTR);
-  }  
+
+    $preconditions = $result[0]['preconditions'];
+    $steps         = $result[0]['steps'];
+
+    $result[0]['preconditions'] = strip_tags($preconditions);
+
+    foreach ($steps as $i => $value) {
+      $result[0]['steps'][$i]['actions'] = strip_tags($steps[$i]['actions']);
+      $result[0]['steps'][$i]['expected_results'] = strip_tags($steps[$i]['expected_results']);
+    }
+  }
+
   return $status_ok ? $result : $this->errors; 
 }
 
@@ -7240,7 +7261,7 @@ protected function createAttachmentTempFile()
     $this->_setArgs($args);
 
     $login = $this->args[self::$userParamName];
-    $pwd  = $this->args['pass'];
+    $pwd   = $this->args['pass'];
 
     $user = new tlUser();
     $user->login = $login;
@@ -7299,11 +7320,11 @@ protected function createAttachmentTempFile()
       return $this->errors;
     }
 
-    $login = $this->args[self::$userParamName];
-    $email = $this->args['email'];
+    $login     = $this->args[self::$userParamName];
+    $email     = $this->args['email'];
     $firstName = $this->args['firstName'];
     $lastName  = $this->args['lastName'];
-    $admin = $this->args['admin'];
+    $admin     = $this->args['admin'];
 
     $user_id = tlUser::doesUserExist($this->dbObj, $login);
     if ( !is_null($user_id) ) {
@@ -7340,7 +7361,7 @@ protected function createAttachmentTempFile()
    * @param string $args["devKey"]
    * @param string $args["user"]
    * @param string $args["role"]
-   * @param int    $args["projectId"]
+   * @param int    $args["testprojectid"]
    * @access public
    */
   public function assignUserToProject($args) {
@@ -7350,12 +7371,12 @@ protected function createAttachmentTempFile()
       return $this->errors;
     }
 
-    $login = $this->args[self::$userParamName];
-    $role  = $this->args['role'];
-    $projectId = $this->args['projectId'];
+    $login     = $this->args[self::$userParamName];
+    $role      = $this->args['role'];
+    $projectId = $this->args[self::$testProjectIDParamName];
 
-    $userId = tlUser::doesUserExist($this->dbObj, $login);
-    $roleId = tlRole::doesRoleExist($this->dbObj, $role, 0);
+    $userId      = tlUser::doesUserExist($this->dbObj, $login);
+    $roleId      = tlRole::doesRoleExist($this->dbObj, $role, 0);
     $testProject = $this->tprojectMgr->get_by_id($projectId);
 
     $hasError = false;
@@ -7391,8 +7412,8 @@ protected function createAttachmentTempFile()
    *
    * @param struct $args
    * @param string $args["devKey"]
-   * @param int $args["projectId"]
-   * @param int $args["epicId"]
+   * @param int $args["testprojectid"]
+   * @param int $args["externalId"]
    * @param string $args["name"]
    * @return int
    * @access public
@@ -7404,7 +7425,7 @@ protected function createAttachmentTempFile()
       return $this->errors;
     }
 
-    $projectId   = $this->args['projectId'];
+    $projectId   = $this->args[self::$testProjectIDParamName];
     $externalId  = $this->args['externalId'];
     $name        = $this->args['name'];
 
@@ -7415,13 +7436,13 @@ protected function createAttachmentTempFile()
       $this->errors[] = new IXR_ERROR(100007, 'Project does not exists');
       $hasError = true;
     } else {
-      $sql     = "SELECT RSPEC.id FROM req_specs RSPEC, nodes_hierarchy NH WHERE NH.name='Requirements' AND RSPEC.id=NH.id AND RSPEC.testproject_id={$projectId}";
+      $sql     = "SELECT RSPEC.id FROM req_specs RSPEC, nodes_hierarchy NH WHERE NH.name='Default' AND RSPEC.id=NH.id AND RSPEC.testproject_id={$projectId}";
       $reqSpec = $this->dbObj->fetchRowsIntoMap($sql, 'id');
       if ( $reqSpec ) {
         $keys      = array_keys($reqSpec);
         $reqSpecId = $keys[0];
       } else {
-        $reqSpec = $this->reqSpecMgr->create($projectId, $projectId, '[RS]', 'Requirements', null, null, $this->userID);
+        $reqSpec = $this->reqSpecMgr->create($projectId, $projectId, '[default]', 'Default', null, null, $this->userID);
         $reqSpecId = $reqSpec['id'];
       }
     }
@@ -7432,6 +7453,496 @@ protected function createAttachmentTempFile()
 
     $requirement = $this->reqMgr->create($reqSpecId, '['.$externalId.']', $name, '', $this->userID);
     return (int) $requirement['id'];
+  }
+
+  /**
+   * Get failed test cases by build id
+   *
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int $args["testprojectid"]
+   * @param int $args["buildid"]
+   * @return mixed
+   * @access public
+   */
+  public function getFailedTestCasesByBuildId($args) {
+    $this->_setArgs($args);
+
+    if ( !$this->authenticate() ) {
+      return $this->errors;
+    }
+
+    $projectId = $this->args[self::$testProjectIDParamName];
+    $buildId   = $this->args[self::$buildIDParamName];
+
+    $testProject = $this->tprojectMgr->get_by_id($projectId);
+    $build       = $this->buildMgr->get_by_id($buildId);
+
+    $hasError = false;
+    if ( is_null($testProject) ) {
+      $this->errors[] = new IXR_ERROR(100007, 'Project does not exists');
+      $hasError = true;
+    } else if ( is_null($build['id']) ) {
+      $this->errors[] = new IXR_ERROR(110100, 'Build does not exists');
+      $hasError = true;
+    } else {
+      $testPlan = $this->tplanMgr->get_by_id($build['testplan_id']);
+      if ($testPlan['testproject_id'] != $projectId) {
+        $this->errors[] = new IXR_ERROR(110200, 'The build does not belong to the project');
+        $hasError = true;
+      }
+    }
+
+    if ( $hasError ) {
+      return $this->errors;
+    }
+
+    $sql = "SELECT NHTCV.parent_id AS tcase_id FROM testplan_tcversions TPTCV JOIN nodes_hierarchy NHTCV ON NHTCV.id = TPTCV.tcversion_id LEFT OUTER JOIN executions E ON E.testplan_id = TPTCV.testplan_id AND E.platform_id = TPTCV.platform_id AND E.tcversion_id = TPTCV.tcversion_id AND E.build_id = {$build['id']} WHERE TPTCV.testplan_id = {$build['testplan_id']} AND E.status = 'f'";
+    $test_cases_ids = array_keys($this->dbObj->fetchRowsIntoMap($sql, 'tcase_id'));
+
+    return $this->convert_test_cases($test_cases_ids);
+  }
+
+  /**
+   * Get test plan by id
+   *
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int $args["testprojectid"]
+   * @param int $args["testplanid"]
+   * @return mixed
+   * @access public
+   */
+  public function getTestPlanById($args) {
+    $this->_setArgs($args);
+
+    if ( !$this->authenticate() ) {
+      return $this->errors;
+    }
+
+    $projectId  = $this->args[self::$testProjectIDParamName];
+    $testplanId = $this->args[self::$testPlanIDParamName];
+
+    $testProject = $this->tprojectMgr->get_by_id($projectId);
+    $testPlan    = $this->tplanMgr->get_by_id($testplanId);
+
+    $hasError = false;
+    if ( is_null($testProject) ) {
+      $this->errors[] = new IXR_ERROR(100007, 'Project does not exists');
+      $hasError = true;
+    } else if ( is_null($testPlan) ) {
+      $this->errors[] = new IXR_ERROR(100100, 'Test plan does not exists');
+      $hasError = true;
+    }
+
+    if ( $hasError ) {
+      return $this->errors;
+    }
+
+    $testPlan[self::$testProjectNameParamName] = $testProject['name'];
+    return $testPlan;
+  }
+
+  /**
+   * Get test case executions by buildId and RequirementId
+   *
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int $args["testprojectid"]
+   * @param int $args["buildid"]
+   * @param int $args["requirementid"]
+   * @return mixed
+   * @access public
+   */
+  public function getTestCasesExecutionsByBuildAndRequirement($args) {
+    $this->_setArgs($args);
+
+    if ( !$this->authenticate() ) {
+      return $this->errors;
+    }
+
+    $projectId     = $this->args[self::$testProjectIDParamName];
+    $buildId       = $this->args[self::$buildIDParamName];
+    $requirementId = $this->args[self::$requirementIDParamName];
+
+    $testProject = $this->tprojectMgr->get_by_id($projectId);
+    $build       = $this->buildMgr->get_by_id($buildId);
+    $requirement = $this->reqMgr->get_by_id($requirementId);
+
+    $hasError = false;
+    if ( is_null($testProject) ) {
+      $this->errors[] = new IXR_ERROR(100007, 'Project does not exists');
+      $hasError = true;
+    } else if ( is_null($build['id']) ) {
+      $this->errors[] = new IXR_ERROR(100100, 'Build does not exists');
+      $hasError = true;
+    } else if ( is_null($requirement) ) {
+      $this->errors[] = new IXR_ERROR(100200, 'Requirement does not exists');
+      $hasError = true;
+    }
+
+    if ( $hasError ) {
+      return $this->errors;
+    }
+
+    $sql = "SELECT NHTCV.parent_id AS tcase_id, E.status AS exec_status FROM testplan_tcversions TPTCV JOIN nodes_hierarchy NHTCV ON NHTCV.id = TPTCV.tcversion_id LEFT OUTER JOIN executions E ON E.testplan_id = TPTCV.testplan_id AND E.platform_id = TPTCV.platform_id AND E.tcversion_id = TPTCV.tcversion_id AND E.build_id = {$build['id']} WHERE TPTCV.testplan_id = {$build['testplan_id']}";
+    $test_cases_executions = $this->dbObj->fetchRowsIntoMap($sql, 'tcase_id');
+
+    $testcase_ids = array_keys($test_cases_executions);
+
+    if ( empty($testcase_ids) ) {
+        return array_values(array());
+    }
+    $in_clause = implode(",", (array) $testcase_ids);
+
+    $sql = "SELECT testcase_id FROM req_coverage WHERE req_id IN ({$requirementId}) AND testcase_id IN ($in_clause)";
+    $reqTestCasesIds = array_keys($this->dbObj->fetchRowsIntoMap($sql, 'testcase_id'));
+
+    return $this->convert_test_cases($reqTestCasesIds, $test_cases_executions);
+  }
+
+  /**
+   * Get test case executions by BuildId and RequirementId and PlatformId
+   *
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int $args["testprojectid"]
+   * @param int $args["buildid"]
+   * @param int $args["requirementid"]
+   * @param int $args["platformid"]
+   * @return mixed
+   * @access public
+   */
+  public function getTestCasesExecutionsByBuildAndPlatformAndRequirement($args) {
+    $this->_setArgs($args);
+
+    if ( !$this->authenticate() ) {
+      return $this->errors;
+    }
+
+    $projectId     = $this->args[self::$testProjectIDParamName];
+    $buildId       = $this->args[self::$buildIDParamName];
+    $requirementId = $this->args[self::$requirementIDParamName];
+    $platformId    = $this->args[self::$platformIDParamName];
+
+    $testProject = $this->tprojectMgr->get_by_id($projectId);
+    $build       = $this->buildMgr->get_by_id($buildId);
+    $requirement = $this->reqMgr->get_by_id($requirementId);
+
+    $platformMgr = new tlPlatform($this->dbObj, $projectId);
+    
+    $platform 	 = $platformMgr->getById($platformId);
+
+    $hasError = false;
+    if ( is_null($testProject) ) {
+      $this->errors[] = new IXR_ERROR(100007, 'Project does not exists');
+      $hasError = true;
+    } else if ( is_null($build['id']) ) {
+      $this->errors[] = new IXR_ERROR(100100, 'Build does not exists');
+      $hasError = true;
+    } else if ( is_null($requirement) ) {
+      $this->errors[] = new IXR_ERROR(100200, 'Requirement does not exists');
+      $hasError = true;
+    } else if ( is_null($platform) ) {
+      $this->errors[] = new IXR_ERROR(100300, 'Platform does not exists');
+      $hasError = true;
+    }
+
+    if ( $hasError ) {
+      return $this->errors;
+    }
+
+    $sql = "SELECT NHTCV.parent_id AS tcase_id, E.status AS exec_status FROM testplan_tcversions TPTCV JOIN nodes_hierarchy NHTCV ON NHTCV.id = TPTCV.tcversion_id LEFT OUTER JOIN executions E ON E.testplan_id = TPTCV.testplan_id AND E.platform_id = TPTCV.platform_id AND E.tcversion_id = TPTCV.tcversion_id AND E.build_id = {$build['id']} WHERE TPTCV.testplan_id = {$build['testplan_id']} AND TPTCV.platform_id = {$platform['id']}";
+    $test_cases_executions = $this->dbObj->fetchRowsIntoMap($sql, 'tcase_id');
+
+    $testcase_ids = array_keys($test_cases_executions);
+
+    if ( empty($testcase_ids) ) {
+        return array_values(array());
+    }
+    $in_clause = implode(",", (array) $testcase_ids);
+
+    $sql = "SELECT testcase_id FROM req_coverage WHERE req_id IN ({$requirementId}) AND testcase_id IN ($in_clause)";
+    $reqTestCasesIds = array_keys($this->dbObj->fetchRowsIntoMap($sql, 'testcase_id'));
+
+    return $this->convert_test_cases($reqTestCasesIds, $test_cases_executions);
+  }
+
+  /**
+   * Get test cases count by requirement id
+   *
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int $args["testprojectid"]
+   * @param int $args["requirementid"]
+   * @return mixed
+   * @access public
+   */
+  public function getTestCasesCountByRequirementId($args) {
+    $this->_setArgs($args);
+
+    if ( !$this->authenticate() ) {
+      return $this->errors;
+    }
+
+    $projectId     = $this->args[self::$testProjectIDParamName];
+    $requirementId = $this->args[self::$requirementIDParamName];
+
+    $testProject = $this->tprojectMgr->get_by_id($projectId);
+    $requirement = $this->reqMgr->get_by_id($requirementId);
+
+    $hasError = false;
+    if ( is_null($testProject) ) {
+      $this->errors[] = new IXR_ERROR(100007, 'Project does not exists');
+      $hasError = true;
+    } else if ( is_null($requirement) ) {
+      $this->errors[] = new IXR_ERROR(100200, 'Requirement does not exists');
+      $hasError = true;
+    }
+
+    if ( $hasError ) {
+      return $this->errors;
+    }
+
+    $testCasesIds = $this->get_covered_test_cases_ids($requirementId);
+
+    return count($testCasesIds);
+  }
+
+  /**
+   * Get test cases count by requirement id
+   *
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int $args["testprojectid"]
+   * @param int $args["requirementid"]
+   * @return mixed
+   * @access public
+   */
+  public function getTestCasesByRequirementId($args) {
+    $this->_setArgs($args);
+
+    if ( !$this->authenticate() ) {
+      return $this->errors;
+    }
+
+    $projectId     = $this->args[self::$testProjectIDParamName];
+    $requirementId = $this->args[self::$requirementIDParamName];
+
+    $testProject = $this->tprojectMgr->get_by_id($projectId);
+    $requirement = $this->reqMgr->get_by_id($requirementId);
+
+    $hasError = false;
+    if ( is_null($testProject) ) {
+      $this->errors[] = new IXR_ERROR(100007, 'Project does not exists');
+      $hasError = true;
+    } else if ( is_null($requirement) ) {
+      $this->errors[] = new IXR_ERROR(100200, 'Requirement does not exists');
+      $hasError = true;
+    }
+
+    if ( $hasError ) {
+      return $this->errors;
+    }
+
+    $testCasesIds = $this->get_covered_test_cases_ids($requirementId);
+
+    return $this->convert_test_cases($testCasesIds);
+  }
+
+  /**
+   * Get not mapped test cases
+   *
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int $args["testprojectid"]
+   * @return mixed
+   * @access public
+   */
+  public function getNotMappedTestCases($args) {
+    $this->_setArgs($args);
+
+    if ( !$this->authenticate() ) {
+      return $this->errors;
+    }
+
+    $projectId   = $this->args[self::$testProjectIDParamName];
+    $testProject = $this->tprojectMgr->get_by_id($projectId);
+
+    $hasError = false;
+    if ( is_null($testProject) ) {
+      $this->errors[] = new IXR_ERROR(100007, 'Project does not exists');
+      $hasError = true;
+    }
+
+    if ( $hasError ) {
+      return $this->errors;
+    }
+
+    $test_suites_ids = $this->node_hierarchy_dfs_recursive($projectId, 'testsuite');
+    $test_cases_ids = $this->get_test_cases_ids_by_test_suites($test_suites_ids);
+
+    if ( empty($test_cases_ids) ) {
+      return array_values(array());
+    }
+
+    $sql = "SELECT R.id AS requirement_id FROM requirements R JOIN req_specs RS on R.srs_id = RS.id AND RS.testproject_id = {$projectId}";
+    $requirements_ids = array_keys($this->dbObj->fetchRowsIntoMap($sql, 'requirement_id'));
+
+    if ( empty($requirements_ids) ) {
+      return $this->convert_test_cases($test_cases_ids);
+    }
+    $in_clause = implode(",", (array) $requirements_ids);
+
+    $covered_test_cases_ids = $this->get_covered_test_cases_ids($in_clause);
+    if ( empty($covered_test_cases_ids) ) {
+      return $this->convert_test_cases($test_cases_ids);
+    }
+    $not_mapped_test_cases_ids = array_diff($test_cases_ids, $covered_test_cases_ids);
+
+    return $this->convert_test_cases($not_mapped_test_cases_ids);
+  }
+
+  /**
+   * Get mapped requirements by test case id
+   *
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int $args["testprojectid"]
+   * @param int $args["testcaseid"]
+   * @return mixed
+   * @access public
+   */
+  public function getMappedRequirementsByTestCaseId($args) {
+    $this->_setArgs($args);
+
+    if ( !$this->authenticate() ) {
+      return $this->errors;
+    }
+
+    $projectId  = $this->args[self::$testProjectIDParamName];
+    $testCaseId = $this->args[self::$testCaseIDParamName];
+
+    $testProject = $this->tprojectMgr->get_by_id($projectId);
+
+    $hasError = false;
+    if ( is_null($testProject) ) {
+      $this->errors[] = new IXR_ERROR(100007, 'Project does not exists');
+      $hasError = true;
+    }
+
+    if ( $hasError ) {
+      return $this->errors;
+    }
+
+    $sql = "SELECT req_id FROM req_coverage WHERE testcase_id = $testCaseId";
+    $mapped_requirements_ids = array_keys($this->dbObj->fetchRowsIntoMap($sql, 'req_id'));
+
+    return $this->convert_requirements($mapped_requirements_ids);
+  }
+
+  private function node_hierarchy_dfs_recursive($node_hierarchy_id, $node_type_description, $nodes_ids = array()) {
+    $sub_nodes_ids = $this->get_sub_nodes_ids($node_hierarchy_id, $node_type_description);
+
+    foreach ($sub_nodes_ids as $sn_id) {
+      array_push($nodes_ids, (int) $sn_id);
+      $nodes_ids = $this->node_hierarchy_dfs_recursive((int) $sn_id, $node_type_description, $nodes_ids);
+    }
+
+    return $nodes_ids;
+  }
+
+  private function get_test_cases_ids_by_test_suites($test_suites_ids) {
+    $test_cases_ids = array();
+
+    foreach ($test_suites_ids as $suite_id) {
+      $sub_test_cases_ids = $this->get_sub_nodes_ids($suite_id, 'testcase');
+      foreach ($sub_test_cases_ids as $tc_id) {
+        array_push($test_cases_ids, $tc_id);
+      }
+    }
+
+    return $test_cases_ids;
+  }
+
+  private function get_sub_nodes_ids($node_hierarchy_id, $node_type_description) {
+    $sql = "SELECT NH.id AS nh_id FROM nodes_hierarchy NH JOIN node_types NT ON NH.node_type_id = NT.id WHERE NT.description = '{$node_type_description}' AND NH.parent_id = {$node_hierarchy_id}";
+    return array_keys($this->dbObj->fetchRowsIntoMap($sql, 'nh_id'));
+  }
+
+  private function get_covered_test_cases_ids($in_clause) {
+    $sql = "SELECT testcase_id FROM req_coverage WHERE req_id IN ($in_clause)";
+    return array_keys($this->dbObj->fetchRowsIntoMap($sql, 'testcase_id'));
+  }
+
+  private function convert_test_cases($test_cases_ids, $test_cases_executions = null) {
+    $test_cases = array();
+
+    foreach ($test_cases_ids as $tc_id) {
+      $tc = $this->tcaseMgr->get_by_id($tc_id, testcase::LATEST_VERSION);
+      $tc[0]['id'] = $tc[0]['testcase_id'];
+
+      if ( $test_cases_executions ) {
+        $tc[0]['exec_status'] = $test_cases_executions[$tc_id]['exec_status'];
+      }
+
+      $preconditions = $tc[0]['preconditions'];
+      $steps         = $tc[0]['steps'];
+
+      $tc[0]['preconditions'] = strip_tags($preconditions);
+
+      foreach ($steps as $i => $value) {
+        $tc[0]['steps'][$i]['actions'] = strip_tags($steps[$i]['actions']);
+        $tc[0]['steps'][$i]['expected_results'] = strip_tags($steps[$i]['expected_results']);
+      }
+
+      array_push($test_cases, $tc[0]);
+    }
+
+    return array_values($test_cases);
+  }
+
+  private function convert_requirements($requirements_ids) {
+    $requirements = array();
+
+    foreach ($requirements_ids as $requirement_id) {
+      $req = $this->reqMgr->get_by_id($requirement_id, requirement_mgr::LATEST_VERSION);
+
+      if ($req) {
+        $this->args[self::$requirementIDParamName] = $requirement_id;
+        $test_cases_count = $this->getTestCasesCountByRequirementId($this->args);
+        $req[0]['test_cases_count'] = $test_cases_count;
+
+        array_push($requirements, $req[0]);
+      }
+    }
+
+    return array_values($requirements);
+  }
+
+/**
+   * Get mapped requirements by test case id
+   *
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int $args["testprojectid"]
+   * @return mixed
+   * @access public
+   */
+  public function getAllTestCasesByProjectId($args) {
+    $this->_setArgs($args);
+
+    if ( !$this->authenticate() ) {
+      return $this->errors;
+    }
+
+    $projectId  = $this->args[self::$testProjectIDParamName];
+    
+    $tcIds=array(); 
+    $this->tprojectMgr->get_all_testcases_id($projectId,$tcIds);
+    
+    return $this->convert_test_cases($tcIds);
+    
   }
 // </MODIFICATION>
 
@@ -7519,7 +8030,16 @@ protected function createAttachmentTempFile()
                             'tl.generateAPIKey' => 'this:generateAPIKey',
                             'tl.createUser' => 'this:createUser',
                             'tl.assignUserToProject' => 'this:assignUserToProject',
-                            'tl.createRequirement' => 'this:createRequirement'
+                            'tl.createRequirement' => 'this:createRequirement',
+                            'tl.getFailedTestCasesByBuildId' => 'this:getFailedTestCasesByBuildId',
+                            'tl.getTestPlanById' => 'this:getTestPlanById',
+                            'tl.getTestCasesExecutionsByBuildAndRequirement' => 'this:getTestCasesExecutionsByBuildAndRequirement',
+			    'tl.getTestCasesExecutionsByBuildAndPlatformAndRequirement' => 'this:getTestCasesExecutionsByBuildAndPlatformAndRequirement',
+                            'tl.getTestCasesCountByRequirementId' => 'this:getTestCasesCountByRequirementId',
+                            'tl.getTestCasesByRequirementId' => 'this:getTestCasesByRequirementId',
+                            'tl.getNotMappedTestCases' => 'this:getNotMappedTestCases',
+                            'tl.getMappedRequirementsByTestCaseId' => 'this:getMappedRequirementsByTestCaseId',
+			    'tl.getAllTestCasesByProjectId' => 'this:getAllTestCasesByProjectId'
                             // </MODIFICATION>
                         );
   }

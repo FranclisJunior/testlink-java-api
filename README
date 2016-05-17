@@ -1,6 +1,8 @@
 TestLink Java API
 =================
 
+PS: Replace file 'xmlrpc.class.php' on '/opt/testlink/apps/testlink/htdocs/lib/api/xmlrpc/v1/' by [a link](https://github.com/FranclisJunior/testlink-java-api/blob/master/src/main/resources/xmlrpc.class.php)
+
 Project homepage: http://testlinkjavaapi.sourceforge.net/
 
 TestLink Java API is a Java API that interfaces TestLink XML-RPC API. This API lets you call TestLink internal methods such as createTestProject, uploadAttachment, getTestProjectByName among others.
@@ -12,4 +14,5 @@ One fact to keep in mind is that TestLink Java API can't assure you Backward Com
 Another important thing is that behind the scenes we are using xml-rpc to communicate with TestLink. However you won't see any xml or even a Map/HashMap when using TestLink Java API (ok, maybe in only one method :-).
 
 If you call the method getTestPlanPlatforms it will return an array of Platform (an object in TestLink Java API). This way you won't need handle Maps :-) And in case of any error, the message will come to you in a nice TestLinkAPIException. This is the basic concepts to get the gist of the TestLink Java API.
+
 
