@@ -1,7 +1,7 @@
 TestLink Java API
 =================
 
-PS: Replace file 'xmlrpc.class.php' on '/opt/testlink/apps/testlink/htdocs/lib/api/xmlrpc/v1/' by 
+PS: Replace file 'xmlrpc.class.php' on '/opt/testlink/apps/testlink/htdocs/lib/api/xmlrpc/v1/' (TestLink installation path) by 
 [xmlrpc.class.php](https://github.com/FranclisJunior/testlink-java-api/blob/master/src/main/resources/xmlrpc.class.php)
 
 Project homepage: http://testlinkjavaapi.sourceforge.net/
