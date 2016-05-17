@@ -905,7 +905,7 @@ public class TestLinkAPI {
      * @return Array of Test Cases.
      * @throws TestLinkAPIException
      */
-    public TestCase[] getTestCasesExecutions(Integer testProjectId, Integer buildId, Integer requirementId)
+    public TestCase[] getTestCasesExecutionsByBuildAndRequirement(Integer testProjectId, Integer buildId, Integer requirementId)
     		throws TestLinkAPIException {
         return this.testCaseService.getTestCasesExecutionsByBuildAndRequirement(testProjectId, buildId, requirementId);
     }
@@ -920,7 +920,7 @@ public class TestLinkAPI {
      * @return Array of Test Cases.
      * @throws TestLinkAPIException
      */
-    public TestCase[] getTestCasesExecutions(Integer testProjectId, Integer buildId, Integer platformId, Integer requirementId)
+    public TestCase[] getTestCasesExecutionsByBuildAndPlatformAndRequirement(Integer testProjectId, Integer buildId, Integer platformId, Integer requirementId)
     		throws TestLinkAPIException {
         return this.testCaseService.getTestCasesExecutionsByBuildAndPlatformAndRequirement(testProjectId, buildId, platformId, requirementId);
     }

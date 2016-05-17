@@ -70,11 +70,13 @@ public enum TestLinkMethods {
     GET_TEST_CASES_COUNT_BY_REQUIREMENT_ID("tl.getTestCasesCountByRequirementId"), 
     GET_TEST_CASES_BY_REQUIREMENT_ID("tl.getTestCasesByRequirementId"),
     GET_TEST_CASES_BY_PROJECT_ID("tl.getAllTestCasesByProjectId"),
+    GET_TEST_CASE_KEYWORDS("tl.getTestCaseKeywords"),
     GET_NOT_MAPPED_TEST_CASES("tl.getNotMappedTestCases"),
+    GET_MAPPED_REQUIREMENTS_BY_TEST_CASE_ID("tl.getMappedRequirementsByTestCaseId"),
     GET_TEST_CASE_ID_BY_NAME("tl.getTestCaseIDByName"),
     GET_TEST_PLAN_BY_NAME("tl.getTestPlanByName"),
     GET_TEST_PLAN_BY_ID("tl.getTestPlanById"),
-    GET_TEST_PLAN_CUSTOM_FIELD_DESING_VALUE("tl.getTestPlanCustomFieldDesignValue"),
+    GET_TEST_PLAN_CUSTOM_FIELD_DESIGN_VALUE("tl.getTestPlanCustomFieldDesignValue"),
     GET_TEST_PLAN_PLATFORMS("tl.getTestPlanPlatforms"), 
     GET_TEST_PROJECT_BY_NAME("tl.getTestProjectByName"), 
     GET_TEST_SUITE_BY_ID("tl.getTestSuiteByID"), 
@@ -88,6 +90,7 @@ public enum TestLinkMethods {
     SAY_HELLO("tl.sayHello"), 
     SET_TEST_MODE("tl.setTestMode"), 
     SET_TEST_CASE_EXECUTION_TYPE("tl.setTestCaseExecutionType"), 
+    UPDATE_TEST_CASE("tl.updateTestCase"),
     UPDATE_TEST_CASE_CUSTOM_FIELD_VALUE("tl.updateTestCaseCustomFieldDesignValue"),
     UPLOAD_ATTACHMENT("tl.uploadAttachment"), 
     UPLOAD_EXECUTION_ATTACHMENT("tl.uploadExecutionAttachment"),
@@ -95,11 +98,8 @@ public enum TestLinkMethods {
     UPLOAD_REQUIREMENT_SPECIFICATION_ATTACHMENT("tl.uploadRequirementSpecificationAttachment"), 
     UPLOAD_TEST_CASE_ATTACHMENT("tl.uploadTestCaseAttachment"), 
     UPLOAD_TEST_SUITE_ATTACHMENT("tl.uploadTestSuiteAttachment"), 
-    UPLOAD_TEST_PROJECT_ATTACHMENT("tl.uploadTestProjectAttachment"),
-    GET_MAPPED_REQUIREMENTS_BY_TEST_CASE_ID("tl.getMappedRequirementsByTestCaseId"),
-    UPDATE_TEST_CASE("tl.updateTestCase"),     
-    GET_TEST_CASE_KEYWORDS("tl.getTestCaseKeywords"),
-    GET_TEST_PLAN_CUSTOM_FIELD_DESIGN_VALUE("tl.getTestPlanCustomFieldDesignValue");
+    UPLOAD_TEST_PROJECT_ATTACHMENT("tl.uploadTestProjectAttachment")
+    ;
 
     private String value;
 
