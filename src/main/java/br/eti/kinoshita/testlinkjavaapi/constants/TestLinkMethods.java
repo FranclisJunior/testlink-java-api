@@ -65,7 +65,7 @@ public enum TestLinkMethods {
     GET_TEST_CASE_CUSTOM_FIELD_EXECUTION_VALUE("tl.getTestCaseCustomFieldExecutionValue"),
     GET_TEST_CASES_FOR_TEST_SUITE("tl.getTestCasesForTestSuite"), 
     GET_TEST_CASES_FOR_TEST_PLAN("tl.getTestCasesForTestPlan"), 
-    GET_TEST_CASES_EXECUTIONS_BY_BUILD_AND_REQUIREMENT("tl.tl.getTestCasesExecutionsByBuildAndRequirement"), 
+    GET_TEST_CASES_EXECUTIONS_BY_BUILD_AND_REQUIREMENT("tl.getTestCasesExecutionsByBuildAndRequirement"), 
     GET_TEST_CASES_EXECUTIONS_BY_BUILD_AND_PLATFORM_AND_REQUIREMENT("tl.getTestCasesExecutionsByBuildAndPlatformAndRequirement"), 
     GET_TEST_CASES_COUNT_BY_REQUIREMENT_ID("tl.getTestCasesCountByRequirementId"), 
     GET_TEST_CASES_BY_REQUIREMENT_ID("tl.getTestCasesByRequirementId"),
