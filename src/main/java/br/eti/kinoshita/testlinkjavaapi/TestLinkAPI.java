@@ -1263,9 +1263,9 @@ public class TestLinkAPI {
      * @return requirementId.
      * @throws TestLinkAPIException
      */
-    public Integer createRequirement(Integer projectId, Integer externalId, String name, 
+    public Integer createRequirement(Integer projectId, Integer externalId, String name, String scope,
     		RequirementStatus status, RequirementType type) throws TestLinkAPIException {
-    	return requirementService.createRequirement(projectId, externalId, name, status, type);
+    	return requirementService.createRequirement(projectId, externalId, name, scope, status, type);
     }
     
     /**

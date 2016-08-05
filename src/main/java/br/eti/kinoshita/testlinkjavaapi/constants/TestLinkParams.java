@@ -101,6 +101,7 @@ public enum TestLinkParams {
     REQUIREMENTS("requirements"), 
     ROLE("role"),
     SUMMARY("summary"), 
+    SCOPE("scope"),
     STATUS("status"), 
     TYPE("type"),
     STEP_EXECUTION_TYPE("execution_type"), 

@@ -144,13 +144,14 @@ class RequirementService extends BaseService {
         return requirements;
     }
 	
-	protected Integer createRequirement(Integer projectId, Integer externalId, String name,
+	protected Integer createRequirement(Integer projectId, Integer externalId, String name, String scope,
 			RequirementStatus status, RequirementType type) throws TestLinkAPIException {
 		try {
 			Map<String, Object> executionData = new HashMap<String, Object>();
 			executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), projectId);
 			executionData.put(TestLinkParams.EXTERNAL_ID.toString(), externalId);
 			executionData.put(TestLinkParams.NAME.toString(), name);
+			executionData.put(TestLinkParams.SCOPE.toString(), scope);
 			executionData.put(TestLinkParams.STATUS.toString(), status.toString());
 			executionData.put(TestLinkParams.TYPE.toString(), type.toString());
 			
