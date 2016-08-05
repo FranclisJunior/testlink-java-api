@@ -101,7 +101,8 @@ public enum TestLinkParams {
     REQUIREMENTS("requirements"), 
     ROLE("role"),
     SUMMARY("summary"), 
-    STATUS("status"), // TBD: what is the difference between status and executestatus?
+    STATUS("status"), 
+    TYPE("type"),
     STEP_EXECUTION_TYPE("execution_type"), 
     STEP_NUMBER("step_number"), 
     STEPS("steps"), 

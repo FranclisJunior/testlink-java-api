@@ -42,6 +42,8 @@ import org.slf4j.LoggerFactory;
 import br.eti.kinoshita.testlinkjavaapi.constants.ActionOnDuplicate;
 import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionStatus;
 import br.eti.kinoshita.testlinkjavaapi.constants.ExecutionType;
+import br.eti.kinoshita.testlinkjavaapi.constants.RequirementStatus;
+import br.eti.kinoshita.testlinkjavaapi.constants.RequirementType;
 import br.eti.kinoshita.testlinkjavaapi.constants.ResponseDetails;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestCaseDetails;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestCaseStatus;
@@ -1256,12 +1258,14 @@ public class TestLinkAPI {
      * @param projectId
      * @param externalId
      * @param name
+     * @param status
+     * @param type
      * @return requirementId.
      * @throws TestLinkAPIException
      */
-    public Integer createRequirement(Integer projectId, Integer externalId, String name) 
-    		throws TestLinkAPIException {
-    	return requirementService.createRequirement(projectId, externalId, name);
+    public Integer createRequirement(Integer projectId, Integer externalId, String name, 
+    		RequirementStatus status, RequirementType type) throws TestLinkAPIException {
+    	return requirementService.createRequirement(projectId, externalId, name, status, type);
     }
     
     /**

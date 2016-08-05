@@ -30,6 +30,8 @@ import java.util.Map;
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 
+import br.eti.kinoshita.testlinkjavaapi.constants.RequirementStatus;
+import br.eti.kinoshita.testlinkjavaapi.constants.RequirementType;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkMethods;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkParams;
 import br.eti.kinoshita.testlinkjavaapi.constants.TestLinkResponseParams;
@@ -142,13 +144,15 @@ class RequirementService extends BaseService {
         return requirements;
     }
 	
-	protected Integer createRequirement(Integer projectId, Integer externalId, String name) 
-			throws TestLinkAPIException {
+	protected Integer createRequirement(Integer projectId, Integer externalId, String name,
+			RequirementStatus status, RequirementType type) throws TestLinkAPIException {
 		try {
 			Map<String, Object> executionData = new HashMap<String, Object>();
 			executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), projectId);
 			executionData.put(TestLinkParams.EXTERNAL_ID.toString(), externalId);
 			executionData.put(TestLinkParams.NAME.toString(), name);
+			executionData.put(TestLinkParams.STATUS.toString(), status.toString());
+			executionData.put(TestLinkParams.TYPE.toString(), type.toString());
 			
 			Object response = this.executeXmlRpcCall(TestLinkMethods.CREATE_REQUIREMENT.toString(), executionData);
 			Integer requirementId = Integer.parseInt(response.toString());
