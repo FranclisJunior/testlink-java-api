@@ -91,6 +91,7 @@ public enum TestLinkMethods {
     SET_TEST_MODE("tl.setTestMode"), 
     SET_TEST_CASE_EXECUTION_TYPE("tl.setTestCaseExecutionType"), 
     UPDATE_TEST_CASE("tl.updateTestCase"),
+    UPDATE_REQUIREMENT("tl.updateRequirement"),
     UPDATE_TEST_CASE_CUSTOM_FIELD_VALUE("tl.updateTestCaseCustomFieldDesignValue"),
     UPLOAD_ATTACHMENT("tl.uploadAttachment"), 
     UPLOAD_EXECUTION_ATTACHMENT("tl.uploadExecutionAttachment"),

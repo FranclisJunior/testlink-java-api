@@ -62,6 +62,7 @@ class TestlinkXMLRPCServer extends IXR_Server
   const BUILD_GUESS_DEFAULT_MODE=OFF;
   const SET_ERROR=true;
   const CHECK_PUBLIC_PRIVATE_ATTR=true;
+  const REQ_STATUS_DRAFT='D';
  
   /**
    * The DB object used throughout the class
@@ -7415,6 +7416,9 @@ protected function createAttachmentTempFile()
    * @param int $args["testprojectid"]
    * @param int $args["externalId"]
    * @param string $args["name"]
+   * @param string $args["scope"]
+   * @param string $args["status"]
+   * @param string $args["type"]
    * @return int
    * @access public
    */
@@ -7428,6 +7432,9 @@ protected function createAttachmentTempFile()
     $projectId   = $this->args[self::$testProjectIDParamName];
     $externalId  = $this->args['externalId'];
     $name        = $this->args['name'];
+    $scope       = $this->args['scope'];
+    $status	 = $this->args['status'];
+    $type	 = $this->args['type'];
 
     $testProject = $this->tprojectMgr->get_by_id($projectId);
 
@@ -7451,8 +7458,63 @@ protected function createAttachmentTempFile()
       return $this->errors;
     }
 
-    $requirement = $this->reqMgr->create($reqSpecId, '['.$externalId.']', $name, '', $this->userID);
+    $requirement = $this->reqMgr->create($reqSpecId, '['.$externalId.']', $name, $scope, $this->userID, $status, $type);
     return (int) $requirement['id'];
+  }
+
+  /**
+   * Update a requirement
+   *
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int $args["testprojectid"]
+   * @param int $args["requirementid"]
+   * @param int $args["externalId"]
+   * @param string $args["name"]
+   * @param string $args["scope"]
+   * @param string $args["status"]
+   * @param string $args["type"]
+   * @return int
+   * @access public
+   */
+  public function updateRequirement($args) {
+    $this->_setArgs($args);
+    
+    if ( !$this->authenticate() ) {
+      return $this->errors;
+    }
+
+    $projectId   = $this->args[self::$testProjectIDParamName]; 
+    $reqId       = $this->args['requirementid'];
+    $externalId  = $this->args['externalId'];
+    $name        = $this->args['name'];
+    $scope       = $this->args['scope'];
+    $status	 = $this->args['status'];
+    $type	 = $this->args['type'];
+
+    $testProject = $this->tprojectMgr->get_by_id($projectId);
+    $requirement = $this->reqMgr->get_by_id($reqId);
+    $hasError = false;
+    if ( is_null($testProject) ) {
+      $this->errors[] = new IXR_ERROR(100007, 'Project does not exists');
+      $hasError = true;
+    } else if ( is_null($requirement) ) {
+      $this->errors[] = new IXR_ERROR(111007, 'Requirement does not exists');
+      $hasError = true;	
+    }
+
+    if ( $hasError ) {
+      return $this->errors;
+    } else {
+      $last_version = $this->reqMgr->get_last_version_info($reqId);
+      $result = $this->reqMgr->update($reqId, $last_version['id'], '['.$externalId.']', $name, $scope, $this->userID, $status, $type, 1);
+      if ( $result['status_ok'] ) {
+	return $reqId;	      
+      } else {
+	$this->errors[] = new IXR_ERROR(133007, 'Error to update requirement');
+	return $this->errors;
+      }
+    }
   }
 
   /**
@@ -7841,6 +7903,31 @@ protected function createAttachmentTempFile()
     return $this->convert_requirements($mapped_requirements_ids);
   }
 
+   /**
+   * Get mapped requirements by test case id
+   *
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int $args["testprojectid"]
+   * @return mixed
+   * @access public
+   */
+  public function getAllTestCasesByProjectId($args) {
+    $this->_setArgs($args);
+
+    if ( !$this->authenticate() ) {
+      return $this->errors;
+    }
+
+    $projectId  = $this->args[self::$testProjectIDParamName];
+    
+    $tcIds=array(); 
+    $this->tprojectMgr->get_all_testcases_id($projectId,$tcIds);
+    
+    return $this->convert_test_cases($tcIds);
+    
+  }
+
   private function node_hierarchy_dfs_recursive($node_hierarchy_id, $node_type_description, $nodes_ids = array()) {
     $sub_nodes_ids = $this->get_sub_nodes_ids($node_hierarchy_id, $node_type_description);
 
@@ -7920,30 +8007,7 @@ protected function createAttachmentTempFile()
     return array_values($requirements);
   }
 
-/**
-   * Get mapped requirements by test case id
-   *
-   * @param struct $args
-   * @param string $args["devKey"]
-   * @param int $args["testprojectid"]
-   * @return mixed
-   * @access public
-   */
-  public function getAllTestCasesByProjectId($args) {
-    $this->_setArgs($args);
 
-    if ( !$this->authenticate() ) {
-      return $this->errors;
-    }
-
-    $projectId  = $this->args[self::$testProjectIDParamName];
-    
-    $tcIds=array(); 
-    $this->tprojectMgr->get_all_testcases_id($projectId,$tcIds);
-    
-    return $this->convert_test_cases($tcIds);
-    
-  }
 // </MODIFICATION>
 
 
@@ -8031,6 +8095,7 @@ protected function createAttachmentTempFile()
                             'tl.createUser' => 'this:createUser',
                             'tl.assignUserToProject' => 'this:assignUserToProject',
                             'tl.createRequirement' => 'this:createRequirement',
+			    'tl.updateRequirement' => 'this:updateRequirement',
                             'tl.getFailedTestCasesByBuildId' => 'this:getFailedTestCasesByBuildId',
                             'tl.getTestPlanById' => 'this:getTestPlanById',
                             'tl.getTestCasesExecutionsByBuildAndRequirement' => 'this:getTestCasesExecutionsByBuildAndRequirement',

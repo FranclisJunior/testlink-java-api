@@ -1271,6 +1271,23 @@ public class TestLinkAPI {
     /**
      * Uploads an attachment to a Requirement.
      * 
+     * @param projectId
+     * @param requirementId
+     * @param externalId
+     * @param name
+     * @param status
+     * @param type
+     * @return requirementId.
+     * @throws TestLinkAPIException
+     */
+    public Integer updateRequirement(Integer projectId, Integer requirementId, Integer externalId, String name, String scope,
+    		RequirementStatus status, RequirementType type) throws TestLinkAPIException {
+    	return requirementService.updateRequirement(projectId, requirementId, externalId, name, scope, status, type);
+    }
+    
+    /**
+     * Uploads an attachment to a Requirement.
+     * 
      * @param requirementId
      * @param title
      * @param description

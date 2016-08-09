@@ -165,5 +165,27 @@ class RequirementService extends BaseService {
 					xmlrpcex);
 		}
 	}
+	
+	protected Integer updateRequirement(Integer projectId, Integer requirementId, Integer externalId, String name, String scope,
+			RequirementStatus status, RequirementType type) throws TestLinkAPIException {
+		try {
+			Map<String, Object> executionData = new HashMap<String, Object>();
+			executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), projectId);
+			executionData.put(TestLinkParams.REQUIREMENT_ID.toString(), requirementId);
+			executionData.put(TestLinkParams.EXTERNAL_ID.toString(), externalId);
+			executionData.put(TestLinkParams.NAME.toString(), name);
+			executionData.put(TestLinkParams.SCOPE.toString(), scope);
+			executionData.put(TestLinkParams.STATUS.toString(), status.toString());
+			executionData.put(TestLinkParams.TYPE.toString(), type.toString());
+			
+			Object response = this.executeXmlRpcCall(TestLinkMethods.UPDATE_REQUIREMENT.toString(), executionData);
+			
+			return Integer.parseInt(response.toString());
+			
+		} catch (XmlRpcException xmlrpcex) {
+			throw new TestLinkAPIException("Error update requirement: " + xmlrpcex.getMessage(),
+					xmlrpcex);
+		}
+	}
 
 }
