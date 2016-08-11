@@ -618,7 +618,7 @@ class TestCaseService extends BaseService {
             Map<String, Object> executionData = new HashMap<String, Object>();
             executionData.put(TestLinkParams.TEST_CASE_LIST_ID.toString(), testCaseIds);
 
-            Object response = this.executeXmlRpcCall(TestLinkMethods.GET_TEST_CASE_BY_ID.toString(), executionData);
+            Object response = this.executeXmlRpcCall(TestLinkMethods.GET_TEST_CASES_BY_LIST_ID.toString(), executionData);
     		Object[] responseArray = Util.castToArray(response);
 
 			testCases = new TestCase[responseArray.length];
