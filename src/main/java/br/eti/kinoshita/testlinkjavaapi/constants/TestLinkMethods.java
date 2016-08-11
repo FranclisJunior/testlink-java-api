@@ -67,6 +67,7 @@ public enum TestLinkMethods {
     GET_TEST_CASES_FOR_TEST_SUITE("tl.getTestCasesForTestSuite"), 
     GET_TEST_CASES_FOR_TEST_PLAN("tl.getTestCasesForTestPlan"), 
     GET_TEST_CASES_BY_LIST_ID("tl.getListTestCaseByListId"),
+    GET_TEST_CASES_EXECUTIONS_BY_BUILD_AND_PLATFORM("tl.getTestCasesExecutionsByBuildAndPlatform"), 
     GET_TEST_CASES_EXECUTIONS_BY_BUILD_AND_REQUIREMENT("tl.getTestCasesExecutionsByBuildAndRequirement"), 
     GET_TEST_CASES_EXECUTIONS_BY_BUILD_AND_PLATFORM_AND_REQUIREMENT("tl.getTestCasesExecutionsByBuildAndPlatformAndRequirement"), 
     GET_TEST_CASES_COUNT_BY_REQUIREMENT_ID("tl.getTestCasesCountByRequirementId"), 

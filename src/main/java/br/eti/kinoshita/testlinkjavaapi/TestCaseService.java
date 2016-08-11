@@ -413,6 +413,38 @@ class TestCaseService extends BaseService {
      * @param testProjectId
      * @param buildId
      * @param platformId
+     * @return TestCase []
+     * @throws TestLinkAPIException
+     */
+    protected TestCase[] getTestCasesExecutionsByBuildAndPlatform(Integer testProjectId, Integer buildId, Integer platformId) {
+    	TestCase[] testCases = null;
+
+        try {
+            Map<String, Object> executionData = new HashMap<String, Object>();
+            executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), testProjectId);
+            executionData.put(TestLinkParams.BUILD_ID.toString(), buildId);
+            executionData.put(TestLinkParams.PLATFORM_ID.toString(), platformId);
+            
+            Object response = this.executeXmlRpcCall(TestLinkMethods.GET_TEST_CASES_EXECUTIONS_BY_BUILD_AND_PLATFORM.toString(), executionData);
+			Object[] responseArray = Util.castToArray(response);
+
+			testCases = new TestCase[responseArray.length];
+
+			for (int i = 0; i < responseArray.length; i++) {
+				Map<String, Object> responseMap = (Map<String, Object>) responseArray[i];
+				testCases[i] = Util.getTestCase(responseMap);
+			}
+        } catch (XmlRpcException xmlrpcex) {
+            throw new TestLinkAPIException("Error retrieving test cases executions: " + xmlrpcex.getMessage(), xmlrpcex);
+        }
+
+        return testCases;
+    }
+    
+    /**
+     * @param testProjectId
+     * @param buildId
+     * @param platformId
      * @param requirementId
      * @return 
      * @throws TestLinkAPIException
