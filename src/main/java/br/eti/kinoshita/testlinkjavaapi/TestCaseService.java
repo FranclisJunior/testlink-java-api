@@ -378,7 +378,6 @@ class TestCaseService extends BaseService {
 
     
     /**
-<<<<<<< HEAD
      * @param testProjectId
      * @param buildId
      * @param requirementId
@@ -552,13 +551,11 @@ class TestCaseService extends BaseService {
 
     /**
      * 
-=======
      *
->>>>>>> upstream/master
      * @param testCaseId
      * @param testCaseExternalId
      * @param version
-     * @return
+     * @return TestCase
      * @throws TestLinkAPIException
      */
     protected TestCase getTestCase(Integer testCaseId, Integer testCaseExternalId, Integer version)
@@ -567,7 +564,6 @@ class TestCaseService extends BaseService {
 
         try {
             Map<String, Object> executionData = new HashMap<String, Object>();
-
             executionData.put(TestLinkParams.TEST_CASE_ID.toString(), testCaseId);
             executionData.put(TestLinkParams.TEST_CASE_EXTERNAL_ID.toString(), testCaseExternalId);
             executionData.put(TestLinkParams.VERSION.toString(), version);
@@ -584,12 +580,66 @@ class TestCaseService extends BaseService {
 
         return testCase;
     }
+    
+    /**
+     * @param testCaseId
+     * @return TestCase
+     * @throws TestLinkAPIException
+     */
+    protected TestCase getTestCaseById(Integer testCaseId) throws TestLinkAPIException {
+        TestCase testCase = null;
+
+        try {
+            Map<String, Object> executionData = new HashMap<String, Object>();
+            executionData.put(TestLinkParams.TEST_CASE_ID.toString(), testCaseId);
+
+            Object response = this.executeXmlRpcCall(TestLinkMethods.GET_TEST_CASE_BY_ID.toString(), executionData);
+
+            Object[] responseArray = Util.castToArray(response);
+            Map<String, Object> responseMap = (Map<String, Object>) responseArray[0];
+
+            testCase = Util.getTestCase(responseMap);
+        } catch (XmlRpcException xmlrpcex) {
+            throw new TestLinkAPIException("Error getting test case info : " + xmlrpcex.getMessage(), xmlrpcex);
+        }
+
+        return testCase;
+    }
+    
+    /**
+     * @param testCaseId
+     * @return TestCase
+     * @throws TestLinkAPIException
+     */
+    protected TestCase[] getTestCaseByListId(Integer[] testCaseIds) throws TestLinkAPIException {
+        TestCase[] testCases = null;
+
+        try {
+            Map<String, Object> executionData = new HashMap<String, Object>();
+            executionData.put(TestLinkParams.TEST_CASE_LIST_ID.toString(), testCaseIds);
+
+            Object response = this.executeXmlRpcCall(TestLinkMethods.GET_TEST_CASE_BY_ID.toString(), executionData);
+    		Object[] responseArray = Util.castToArray(response);
+
+			testCases = new TestCase[responseArray.length];
+
+			for (int i = 0; i < responseArray.length; i++) {
+				Map<String, Object> responseMap = (Map<String, Object>) responseArray[i];
+				testCases[i] = Util.getTestCase(responseMap);
+			}
+        } catch (XmlRpcException xmlrpcex) {
+            throw new TestLinkAPIException("Error retrieving test cases executions: " + xmlrpcex.getMessage(), xmlrpcex);
+        }
+
+        return testCases;
+    }
+    
 
     /**
      *
      * @param fullTestCaseExternalId Full external id: prefix-externalId
      * @param version
-     * @return
+     * @return TestCase
      * @throws TestLinkAPIException
      */
     protected TestCase getTestCaseByExternalId(String fullTestCaseExternalId, Integer version)

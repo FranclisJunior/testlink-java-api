@@ -111,6 +111,7 @@ public enum TestLinkParams {
     TEST_PROJECT_NAME("testprojectname"),
     TEST_CASE_EXTERNAL_ID("testcaseexternalid"),
     TEST_CASE_ID("testcaseid"), 
+    TEST_CASE_LIST_ID("listtestcaseid"),
     TEST_CASE_NAME("testcasename"), 
     TEST_CASE_PATH_NAME("testcasepathname"), 
     TEST_CASE_PREFIX("testcaseprefix"), 

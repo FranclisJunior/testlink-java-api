@@ -861,6 +861,28 @@ public class TestLinkAPI {
             throws TestLinkAPIException {
         return this.testCaseService.getTestCase(testCaseId, testCaseExternalId, version);
     }
+    
+    /**
+     * Get a test case by id
+     * 
+     * @param testCaseId
+     * @return Test Case.
+     * @throws TestLinkAPIException
+     */
+    public TestCase getTestCaseById(Integer testCaseId)throws TestLinkAPIException {
+        return this.testCaseService.getTestCaseById(testCaseId);
+    }
+    
+    /**
+     * Get a test cases by list of ids
+     * 
+     * @param testCaseId
+     * @return Test Case [].
+     * @throws TestLinkAPIException
+     */
+    public TestCase[] getTestCaseByListIds(Integer[] testCaseIds)throws TestLinkAPIException {
+        return this.testCaseService.getTestCaseByListId(testCaseIds);
+    }
 
     /**
      * Get a Test Case using the full external id, composed by the prefix and the external id: prefix-externalId
