@@ -98,6 +98,34 @@ class TestProjectService extends BaseService {
 
 		return testProject;
 	}
+	
+	/**
+	 * update a Test Project.
+	 * 
+	 * @return Updated Test Project object.
+	 */
+	protected TestProject updateTestProject(Integer testProjectId, String testProjectName,
+			String testProjectPrefix, String notes, Boolean enableRequirements,
+			Boolean enableTestPriority, Boolean enableAutomation,
+			Boolean enableInventory, Boolean isActive, Boolean isPublic)
+			throws TestLinkAPIException {
+		
+		TestProject testProject = new TestProject(testProjectId, testProjectName, testProjectPrefix,
+				notes, enableRequirements, enableTestPriority,
+				enableAutomation, enableInventory, isActive, isPublic);
+
+		try {
+			Map<String, Object> executionData = Util.getTestProjectMap(testProject);
+			
+			this.executeXmlRpcCall(TestLinkMethods.UPDATE_TEST_PROJECT.toString(), executionData);
+			
+		} catch (XmlRpcException xmlrpcex) {
+			throw new TestLinkAPIException("Error creating test project: "
+					+ xmlrpcex.getMessage(), xmlrpcex);
+		}
+
+		return testProject;
+	}
 
 	protected TestProject getTestProjectByName(String projectName)
 			throws TestLinkAPIException {

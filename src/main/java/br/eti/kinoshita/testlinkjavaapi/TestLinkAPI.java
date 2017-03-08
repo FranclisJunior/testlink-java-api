@@ -443,6 +443,30 @@ public class TestLinkAPI {
         return this.testProjectService.createTestProject(testProjectName, testProjectPrefix, notes, enableRequirements,
                 enableTestPriority, enableAutomation, enableInventory, isActive, isPublic);
     }
+    
+    /**
+     * Creates a Test Project.
+     * 
+     * @param testProjectId
+     * @param testProjectName
+     * @param testProjectPrefix
+     * @param notes
+     * @param enableRequirements
+     * @param enableTestPriority
+     * @param enableAutomation
+     * @param enableInventory
+     * @param isActive
+     * @param isPublic
+     * @return Test Project object.
+     * @throws TestLinkAPIException
+     * @since 1.0
+     */
+    public TestProject updateTestProject(Integer testProjectId, String testProjectName, String testProjectPrefix, String notes,
+            Boolean enableRequirements, Boolean enableTestPriority, Boolean enableAutomation, Boolean enableInventory,
+            Boolean isActive, Boolean isPublic) throws TestLinkAPIException {
+        return this.testProjectService.updateTestProject(testProjectId, testProjectName, testProjectPrefix, notes, enableRequirements,
+                enableTestPriority, enableAutomation, enableInventory, isActive, isPublic);
+    }
 
     
     /**

@@ -194,6 +194,7 @@ class TestlinkXMLRPCServer extends IXR_Server
   public static $stepsParamName = "steps";
 
   public static $testCaseIDParamName = "testcaseid";
+  public static $listTestCaseIDParamName = "listtestcaseid";
   public static $testCaseExternalIDParamName = "testcaseexternalid";
   public static $testCaseNameParamName = "testcasename";
   public static $testCasePathNameParamName = "testcasepathname";
@@ -2007,7 +2008,8 @@ class TestlinkXMLRPCServer extends IXR_Server
     } 
     return $status_ok ? $out : $this->errors; 
   }
-   
+  
+  
    /**
     * createTestCase
     * @param struct $args
@@ -7249,6 +7251,8 @@ protected function createAttachmentTempFile()
 
 
 // <MODIFICATION>
+
+
   /**
    * Generate the API Key
    *
@@ -7517,6 +7521,58 @@ protected function createAttachmentTempFile()
     }
   }
 
+
+ /**
+   * Get test case by id
+   *
+   * @param struct $args
+   * @param int $args["testcaseid"]
+   * @return mixed $testCase
+   * @access public
+   */
+  public function getTestCaseById($args) {
+  	$this->_setArgs($args);
+  	
+  	if ( !$this->authenticate() ) {
+  		return $this->errors;
+  	}
+  	
+  	$testCaseId  = $this->args[self::$testCaseIDParamName];
+  	$testCase = $this->tcaseMgr->get_by_id($testCaseId);
+  	
+  	$hasError = false;
+  	if ( is_null($testCase) ) {
+  		$this->erros[] = new IXR_ERROR(100007, 'Test Case does not exists');
+  		$hasError = true;
+  	}
+  	
+  	if ( $hasError ) {
+  		return $this->errors;
+  	}
+  	
+  	return $testCase;
+  }
+
+
+  /**
+   * Get list of test case by list id
+   *
+   * @param struct $args
+   * @param int $args["listtestcaseid"]
+   * @return mixed $listTestCase
+   * @access public
+   */
+  public function getListTestCaseByListId($args){
+  	$this->_setArgs($args);
+  	
+  	if ( !$this->authenticate() ) {
+  	    return $this->errors;
+  	}
+  	
+  	$test_cases_ids = $this->args[self::$listTestCaseIDParamName];
+  	return $this->convert_test_cases($test_cases_ids);
+  }
+
   /**
    * Get failed test cases by build id
    *
@@ -7604,6 +7660,63 @@ protected function createAttachmentTempFile()
     $testPlan[self::$testProjectNameParamName] = $testProject['name'];
     return $testPlan;
   }
+
+  /**
+   * Get test case executions by build and platform
+   *
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int $args["testprojectid"]
+   * @param int $args["buildid"]
+   * @param int $args["platformid"]
+   * @return mixed
+   * @access public
+   */
+  public function getTestCasesExecutionsByBuildAndPlatform($args) {
+    $this->_setArgs($args);
+   
+    if ( !$this->authenticate() ) {
+      return $this->errors;
+    }
+
+    $projectId     = $this->args[self::$testProjectIDParamName];
+    $buildId       = $this->args[self::$buildIDParamName];
+    $platformId    = $this->args[self::$platformIDParamName];
+    $platformMgr   = new tlPlatform($this->dbObj, $projectId);
+
+    $testProject = $this->tprojectMgr->get_by_id($projectId);
+    $build       = $this->buildMgr->get_by_id($buildId);
+    $platform 	 = $platformMgr->getById($platformId);
+
+    $hasError = false;
+    if ( is_null($testProject) ) {
+      $this->errors[] = new IXR_ERROR(100007, 'Project does not exists');
+      $hasError = true;
+    } else if ( is_null($build['id']) ) {
+      $this->errors[] = new IXR_ERROR(100100, 'Build does not exists');
+      $hasError = true;
+    } else if ( is_null($platform) ) {
+      $this->errors[] = new IXR_ERROR(100300, 'Platform does not exists');
+      $hasError = true;
+    }
+
+    if ( $hasError ) {
+      return $this->errors;
+    }
+
+    $sql = "SELECT NHTCV.parent_id AS tcase_id, E.status AS exec_status FROM testplan_tcversions TPTCV JOIN nodes_hierarchy NHTCV ON NHTCV.id = TPTCV.tcversion_id LEFT OUTER JOIN executions E ON E.testplan_id = TPTCV.testplan_id AND E.platform_id = TPTCV.platform_id AND E.tcversion_id = TPTCV.tcversion_id AND E.build_id = {$build['id']} WHERE TPTCV.testplan_id = {$build['testplan_id']} AND TPTCV.platform_id = {$platform['id']}";
+    $test_cases_executions = $this->dbObj->fetchRowsIntoMap($sql, 'tcase_id');
+
+    $testcase_ids = array_keys($test_cases_executions);
+
+    if ( empty($testcase_ids) ) {
+        return array_values(array());
+    }
+
+    return $this->convert_test_cases($testcase_ids, $test_cases_executions);
+  }
+
+
 
   /**
    * Get test case executions by buildId and RequirementId
@@ -7928,6 +8041,60 @@ protected function createAttachmentTempFile()
     
   }
 
+  
+  /**
+   * Update a test project
+   * 
+   * @access public
+   * @param struct $args
+   * @param string $args["devKey"]
+   * @param int    $args["testprojectid"] 
+   * @param string $args["testprojectname"]
+   * @param string $args["testcaseprefix"]
+   * @param string $args["notes"] OPTIONAL
+   * @param map    $args["options"] OPTIONAL ALL int treated as boolean
+   *        keys  requirementsEnabled,testPriorityEnabled,automationEnabled,inventoryEnabled
+   *
+   * @param int    $args["active"]  OPTIONAL
+   * @param int    $args["public"]  OPTIONAL
+   *   
+   * @return mixed $resultInfo
+   */
+  public function updateTestProject($args) {
+      $this->_setArgs($args);
+      $msg_prefix = "(" . __FUNCTION__ . ") - ";
+	
+      if ( !$this->authenticate() ) {
+         return $this->errors;
+      }
+      
+      $id = $this->args[self::$testProjectIDParamName];
+      $name = htmlspecialchars($this->args[self::$testProjectNameParamName]);
+      $prefix = htmlspecialchars($this->args[self::$testCasePrefixParamName]);
+      $notes = htmlspecialchars($optional[self::$noteParamName]);
+      $active = $this->args[self::$activeParamName];
+      $is_public = $this->args[self::$publicParamName];
+      $color = '';
+      $options = new stdClass();
+
+      if( $this->_isParamPresent(self::$optionsParamName, $msg_prefix) )      {
+        $dummy = $this->args[self::$optionsParamName];
+        if( is_array($dummy) ) {
+          foreach($dummy as $key => $value) {
+            $options->$key = $value > 0 ? 1 : 0;
+          }
+        }
+      }
+      
+      $info=$this->tprojectMgr->update($id, $name, $color, $notes, $options, $active, $prefix, $is_public);
+
+      $resultInfo = array();
+      $resultInfo[]= array("operation" => __FUNCTION__,
+                           "additionalInfo" => null,
+                           "status" => true, "id" => $info, "message" => GENERAL_SUCCESS_STR);
+      return $resultInfo;
+  }
+
   private function node_hierarchy_dfs_recursive($node_hierarchy_id, $node_type_description, $nodes_ids = array()) {
     $sub_nodes_ids = $this->get_sub_nodes_ids($node_hierarchy_id, $node_type_description);
 
@@ -7964,26 +8131,33 @@ protected function createAttachmentTempFile()
 
   private function convert_test_cases($test_cases_ids, $test_cases_executions = null) {
     $test_cases = array();
-
+    $version_number=-1;
+    $filters = array('active_status' => 'ALL', 'open_status' => 'ALL', 'version_number' => $version_number);
     foreach ($test_cases_ids as $tc_id) {
-      $tc = $this->tcaseMgr->get_by_id($tc_id, testcase::LATEST_VERSION);
-      $tc[0]['id'] = $tc[0]['testcase_id'];
+      $tc = $this->tcaseMgr->get_by_id($tc_id, testcase::LATEST_VERSION, $filters);
+      if ( !is_null($tc) ) {
+	      $tc[0]['id'] = $tc[0]['testcase_id'];
 
-      if ( $test_cases_executions ) {
-        $tc[0]['exec_status'] = $test_cases_executions[$tc_id]['exec_status'];
+	      if ( $test_cases_executions ) {
+		$tc[0]['exec_status'] = $test_cases_executions[$tc_id]['exec_status'];
+	      }
+
+	      $preconditions = $tc[0]['preconditions'];
+	      $steps         = $tc[0]['steps'];
+
+	      $tc[0]['preconditions'] = strip_tags($preconditions);
+		
+	      $dummy = $this->tcaseMgr->getPrefix($tc_id);
+              $tc[0]['full_tc_external_id'] = $dummy[0] . config_get('testcase_cfg')->glue_character .
+                                              $tc[0]['tc_external_id'];
+
+	      foreach ($steps as $i => $value) {
+		$tc[0]['steps'][$i]['actions'] = strip_tags($steps[$i]['actions']);
+		$tc[0]['steps'][$i]['expected_results'] = strip_tags($steps[$i]['expected_results']);
+	      }
+
+	      array_push($test_cases, $tc[0]);
       }
-
-      $preconditions = $tc[0]['preconditions'];
-      $steps         = $tc[0]['steps'];
-
-      $tc[0]['preconditions'] = strip_tags($preconditions);
-
-      foreach ($steps as $i => $value) {
-        $tc[0]['steps'][$i]['actions'] = strip_tags($steps[$i]['actions']);
-        $tc[0]['steps'][$i]['expected_results'] = strip_tags($steps[$i]['expected_results']);
-      }
-
-      array_push($test_cases, $tc[0]);
     }
 
     return array_values($test_cases);
@@ -8098,13 +8272,17 @@ protected function createAttachmentTempFile()
 			    'tl.updateRequirement' => 'this:updateRequirement',
                             'tl.getFailedTestCasesByBuildId' => 'this:getFailedTestCasesByBuildId',
                             'tl.getTestPlanById' => 'this:getTestPlanById',
+			    'tl.getTestCaseById' => 'this:getTestCaseById', 
+                            'tl.getListTestCaseByListId' => 'this:getListTestCaseByListId',
+			    'tl.getTestCasesExecutionsByBuildAndPlatform' => 'this:getTestCasesExecutionsByBuildAndPlatform',
                             'tl.getTestCasesExecutionsByBuildAndRequirement' => 'this:getTestCasesExecutionsByBuildAndRequirement',
 			    'tl.getTestCasesExecutionsByBuildAndPlatformAndRequirement' => 'this:getTestCasesExecutionsByBuildAndPlatformAndRequirement',
                             'tl.getTestCasesCountByRequirementId' => 'this:getTestCasesCountByRequirementId',
                             'tl.getTestCasesByRequirementId' => 'this:getTestCasesByRequirementId',
                             'tl.getNotMappedTestCases' => 'this:getNotMappedTestCases',
                             'tl.getMappedRequirementsByTestCaseId' => 'this:getMappedRequirementsByTestCaseId',
-			    'tl.getAllTestCasesByProjectId' => 'this:getAllTestCasesByProjectId'
+			    'tl.getAllTestCasesByProjectId' => 'this:getAllTestCasesByProjectId',
+			    'tl.updateTestProject' => 'this:updateTestProject'
                             // </MODIFICATION>
                         );
   }

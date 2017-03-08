@@ -83,6 +83,8 @@ public final class Util {
      */
     public static final Map<String, Object> getTestProjectMap(TestProject project) {
         Map<String, Object> executionData = new HashMap<String, Object>();
+        
+        executionData.put(TestLinkParams.TEST_PROJECT_ID.toString(), project.getId());
         executionData.put(TestLinkParams.TEST_PROJECT_NAME.toString(), project.getName());
         executionData.put(TestLinkParams.TEST_CASE_PREFIX.toString(), project.getPrefix());
         executionData.put(TestLinkParams.NOTES.toString(), project.getNotes());
